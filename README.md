@@ -1,4 +1,4 @@
-# weekii
+# MorePHP
 一个基于 `swoole` 的服务端MVC框架
 
 ## 安装
