@@ -1,0 +1,14 @@
+{
+    "name": "Roki/More",
+    "description": "A Swoole MVC Framework ",
+
+    "autoload": {
+        "psr-4": {
+            "Src\\": "More/Src"
+        }
+    },
+
+    "require": {
+        "duncan3dc/blade": "^4.2"
+    }
+}
