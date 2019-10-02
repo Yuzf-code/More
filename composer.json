@@ -9,6 +9,5 @@
     },
 
     "require": {
-        "duncan3dc/blade": "^4.2"
     }
 }
