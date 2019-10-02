@@ -1,10 +1,10 @@
 <?php
-namespace Src\Core\Swoole;
+namespace More\Src\Core\Swoole;
 
-use Src\Core\App;
-use Src\Core\Constant;
-use Src\GlobalEvent;
-use Src\Lib\Config;
+use More\Src\Core\App;
+use More\Src\Core\Constant;
+use More\Src\GlobalEvent;
+use More\Src\Lib\Config;
 
 class ServerManager
 {

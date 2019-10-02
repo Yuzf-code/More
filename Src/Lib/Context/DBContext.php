@@ -6,9 +6,9 @@
  * Time: 16:06
  */
 
-namespace Src\Lib\Context;
+namespace More\Src\Lib\Context;
 
-use Src\Core\Swoole\Coroutine\Context\Context;
+use More\Src\Core\Swoole\Coroutine\Context\Context;
 
 /**
  * DB Coroutine Context Manager

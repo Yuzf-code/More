@@ -6,10 +6,10 @@
  * Time: 23:33
  */
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
 
-use Src\Core\ServiceProvider;
+use More\Src\Core\ServiceProvider;
 
 class DatabaseServiceProvider extends ServiceProvider
 {

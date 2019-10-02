@@ -6,10 +6,10 @@
  * Time: 15:30
  */
 
-namespace Src\Core\Swoole\Coroutine\Context;
+namespace More\Src\Core\Swoole\Coroutine\Context;
 
 
-use Src\Core\Swoole\Coroutine\CoroutineExcepiton;
+use More\Src\Core\Swoole\Coroutine\CoroutineExcepiton;
 
 /**
  * Global Coroutine Context Manager

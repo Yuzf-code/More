@@ -1,11 +1,11 @@
 <?php
 
-namespace Src\Core\Log;
+namespace More\Src\Core\Log;
 
 
-use Src\Core\Log\impl\Cli;
-use Src\Core\ServiceProvider;
-use Src\Lib\Config;
+use More\Src\Core\Log\impl\Cli;
+use More\Src\Core\ServiceProvider;
+use More\Src\Lib\Config;
 
 class LogServiceProvider extends ServiceProvider
 {

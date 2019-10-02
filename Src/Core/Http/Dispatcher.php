@@ -1,9 +1,9 @@
 <?php
-namespace Src\Core\Http;
+namespace More\Src\Core\Http;
 
 use duncan3dc\Laravel\BladeInstance;
-use Src\Core\App;
-use Src\Core\Route\RouteRule;
+use More\Src\Core\App;
+use More\Src\Core\Route\RouteRule;
 
 class Dispatcher
 {

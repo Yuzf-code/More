@@ -6,7 +6,7 @@
  * Time: 18:00
  */
 
-namespace Src\Core;
+namespace More\Src\Core;
 
 
 class Constant

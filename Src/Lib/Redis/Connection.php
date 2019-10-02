@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Lib\Redis;
+namespace More\Src\Lib\Redis;
 
 
-use Src\Lib\Util\Str;
+use More\Src\Lib\Util\Str;
 
 class Connection
 {

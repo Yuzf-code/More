@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Core\Log;
+namespace More\Src\Core\Log;
 
 /**
  * Logger抽象类

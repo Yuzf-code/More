@@ -6,11 +6,11 @@
  * Time: 19:37
  */
 
-namespace Src\Core\Route;
+namespace More\Src\Core\Route;
 
 
-use Src\Core\App;
-use Src\Lib\Config;
+use More\Src\Core\App;
+use More\Src\Lib\Config;
 
 class RouteRule
 {

@@ -6,7 +6,7 @@
  * Time: 15:46
  */
 
-namespace Src\Core\Swoole\Coroutine;
+namespace More\Src\Core\Swoole\Coroutine;
 
 
 use Throwable;

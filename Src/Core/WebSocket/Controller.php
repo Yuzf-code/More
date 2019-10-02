@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Core\WebSocket;
+namespace More\Src\Core\WebSocket;
 
 
-use Src\Core\App;
-use Src\Core\Constant;
+use More\Src\Core\App;
+use More\Src\Core\Constant;
 
 abstract class Controller
 {

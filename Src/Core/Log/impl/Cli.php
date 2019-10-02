@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Core\Log\impl;
+namespace More\Src\Core\Log\impl;
 
-use Src\Core\Log\Logger;
+use More\Src\Core\Log\Logger;
 
 /**
  * 基础的cli logger

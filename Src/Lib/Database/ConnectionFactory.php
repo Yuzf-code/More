@@ -6,10 +6,10 @@
  * Time: 23:13
  */
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
 
-use Src\Core\BaseInterface\Factory;
+use More\Src\Core\BaseInterface\Factory;
 
 class ConnectionFactory implements Factory
 {

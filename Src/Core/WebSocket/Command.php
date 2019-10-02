@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Core\WebSocket;
+namespace More\Src\Core\WebSocket;
 
 
 class Command

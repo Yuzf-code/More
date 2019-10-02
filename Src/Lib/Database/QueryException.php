@@ -6,7 +6,7 @@
  * Time: 18:30
  */
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
 
 use Throwable;

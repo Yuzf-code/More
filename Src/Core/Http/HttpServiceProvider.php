@@ -1,11 +1,11 @@
 <?php
 
-namespace Src\Core\Http;
+namespace More\Src\Core\Http;
 
 
-use Src\Core\Constant;
-use Src\Core\ServiceProvider;
-use Src\Lib\Config;
+use More\Src\Core\Constant;
+use More\Src\Core\ServiceProvider;
+use More\Src\Lib\Config;
 
 class HttpServiceProvider extends ServiceProvider
 {

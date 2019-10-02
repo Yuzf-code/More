@@ -1,7 +1,7 @@
 <?php
-namespace Src\Lib;
+namespace More\Src\Lib;
 
-use Src\Core\BaseInterface\Singleton;
+use More\Src\Core\BaseInterface\Singleton;
 
 class Config
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
 
-use Src\Core\App;
-use Src\Lib\Database\Relation\HasMany;
-use Src\Lib\Database\Relation\HasOne;
-use Src\Lib\Database\Relation\Relation;
+use More\Src\Core\App;
+use More\Src\Lib\Database\Relation\HasMany;
+use More\Src\Lib\Database\Relation\HasOne;
+use More\Src\Lib\Database\Relation\Relation;
 
 class Model implements \ArrayAccess
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Src\Core\BaseInterface;
+namespace More\Src\Core\BaseInterface;
 
 trait Singleton
 {

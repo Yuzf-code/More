@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Core\Swoole;
+namespace More\Src\Core\Swoole;
 
 
 class EventRegister

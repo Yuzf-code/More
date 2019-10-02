@@ -1,11 +1,11 @@
 <?php
 
-namespace Src\Lib\Cache;
+namespace More\Src\Lib\Cache;
 
 
-use Src\Core\ServiceProvider;
-use Src\Lib\Cache\impl\Redis as Cache;
-use Src\Lib\Config;
+use More\Src\Core\ServiceProvider;
+use More\Src\Lib\Cache\impl\Redis as Cache;
+use More\Src\Lib\Config;
 
 class CacheServiceProvider extends ServiceProvider
 {

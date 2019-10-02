@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Core\WebSocket;
+namespace More\Src\Core\WebSocket;
 
 
-use Src\Core\Constant;
-use Src\Core\ServiceProvider;
+use More\Src\Core\Constant;
+use More\Src\Core\ServiceProvider;
 
 class WebSocketServiceProvider extends ServiceProvider
 {

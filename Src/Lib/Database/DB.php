@@ -1,13 +1,13 @@
 <?php
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
 
-use Src\Core\App;
-use Src\Core\BaseInterface\Singleton;
-use Src\Lib\Config;
-use Src\Lib\Context\DBContext;
-use Src\Lib\Pool\Pool;
+use More\Src\Core\App;
+use More\Src\Core\BaseInterface\Singleton;
+use More\Src\Lib\Config;
+use More\Src\Lib\Context\DBContext;
+use More\Src\Lib\Pool\Pool;
 
 /**
  * Class DB
@@ -116,7 +116,7 @@ class DB
      * 获取连接
      * @return Connection
      * @throws ConnectionException
-     * @throws \Src\Core\Swoole\Coroutine\CoroutineExcepiton
+     * @throws \More\Src\Core\Swoole\Coroutine\CoroutineExcepiton
      */
     protected function getConnection():Connection
     {
@@ -143,7 +143,7 @@ class DB
 
     /**
      * 释放连接
-     * @throws \Src\Core\Swoole\Coroutine\CoroutineExcepiton
+     * @throws \More\Src\Core\Swoole\Coroutine\CoroutineExcepiton
      */
     public function freeConnection()
     {
@@ -160,7 +160,7 @@ class DB
      * @param $method
      * @param $arguments
      * @return mixed
-     * @throws \Src\Core\Swoole\Coroutine\CoroutineExcepiton
+     * @throws \More\Src\Core\Swoole\Coroutine\CoroutineExcepiton
      */
     public function __call($method, $arguments)
     {

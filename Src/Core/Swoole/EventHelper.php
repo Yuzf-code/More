@@ -1,16 +1,16 @@
 <?php
-namespace Src\Core\Swoole;
+namespace More\Src\Core\Swoole;
 
 
 use duncan3dc\Laravel\BladeInstance;
-use Src\Core\App;
-use Src\Core\Http\Dispatcher;
-use Src\Core\Http\Request;
-use Src\Core\Http\Response;
-use Src\Core\WebSocket\Command;
-use Src\Core\WebSocket\DispatchException;
-use Src\GlobalEvent;
-use Src\Lib\Config;
+use More\Src\Core\App;
+use More\Src\Core\Http\Dispatcher;
+use More\Src\Core\Http\Request;
+use More\Src\Core\Http\Response;
+use More\Src\Core\WebSocket\Command;
+use More\Src\Core\WebSocket\DispatchException;
+use More\Src\GlobalEvent;
+use More\Src\Lib\Config;
 
 class EventHelper
 {

@@ -6,10 +6,10 @@
  * Time: 14:06
  */
 
-namespace Src\Lib\Redis;
+namespace More\Src\Lib\Redis;
 
 
-use Src\Core\ServiceProvider;
+use More\Src\Core\ServiceProvider;
 
 class RedisServiceProvider extends ServiceProvider
 {

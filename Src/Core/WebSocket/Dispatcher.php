@@ -6,10 +6,10 @@
  * Time: 14:39
  */
 
-namespace Src\Core\WebSocket;
+namespace More\Src\Core\WebSocket;
 
 
-use Src\Core\App;
+use More\Src\Core\App;
 
 class Dispatcher
 {

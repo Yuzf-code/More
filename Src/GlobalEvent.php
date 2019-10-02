@@ -1,11 +1,11 @@
 <?php
 namespace Src;
 
-use Src\Core\Http\Request;
-use Src\Core\Http\Response;
-use Src\Core\Swoole\EventRegister;
-use Src\Core\WebSocket\Command;
-use Src\Lib\Config;
+use More\Src\Core\Http\Request;
+use More\Src\Core\Http\Response;
+use More\Src\Core\Swoole\EventRegister;
+use More\Src\Core\WebSocket\Command;
+use More\Src\Lib\Config;
 
 class GlobalEvent
 {

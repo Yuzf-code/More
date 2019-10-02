@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Lib\Session\impl;
+namespace More\Src\Lib\Session\impl;
 
 
-use Src\Core\App;
-use Src\Lib\Session\Session;
+use More\Src\Core\App;
+use More\Src\Lib\Session\Session;
 
 class Redis extends Session
 {

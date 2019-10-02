@@ -6,10 +6,10 @@
  * Time: 19:15
  */
 
-namespace Src\Lib\Pool;
+namespace More\Src\Lib\Pool;
 
 
-use Src\Core\BaseInterface\Factory;
+use More\Src\Core\BaseInterface\Factory;
 
 class Pool
 {

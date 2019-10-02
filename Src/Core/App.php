@@ -1,12 +1,12 @@
 <?php
-namespace Src\Core;
+namespace More\Src\Core;
 
-use Src\Core\Log\Logger;
-use Src\Core\Swoole\ServerManager;
-use Src\GlobalEvent;
-use Src\Lib\Config;
-use Src\Lib\Database\DB;
-use Src\Lib\Redis\RedisManager;
+use More\Src\Core\Log\Logger;
+use More\Src\Core\Swoole\ServerManager;
+use More\Src\GlobalEvent;
+use More\Src\Lib\Config;
+use More\Src\Lib\Database\DB;
+use More\Src\Lib\Redis\RedisManager;
 
 /**
  * Class App
@@ -14,7 +14,7 @@ use Src\Lib\Redis\RedisManager;
  * @property RedisManager $redis
  * @property Logger $logger
  * @property ServerManager $serverManager
- * @package Src\Core
+ * @package More\Src\Core
  */
 class App extends Container
 {

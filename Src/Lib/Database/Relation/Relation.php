@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Lib\Database\Relation;
+namespace More\Src\Lib\Database\Relation;
 
 
-use Src\Core\App;
-use Src\Lib\Database\Model;
+use More\Src\Core\App;
+use More\Src\Lib\Database\Model;
 
 abstract class Relation
 {

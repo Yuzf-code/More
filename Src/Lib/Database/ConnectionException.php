@@ -6,7 +6,7 @@
  * Time: 20:57
  */
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
 
 class ConnectionException extends \Exception

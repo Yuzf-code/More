@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Lib\Database;
+namespace More\Src\Lib\Database;
 
-use Src\Core\App;
-use Src\Lib\Util\Str;
+use More\Src\Core\App;
+use More\Src\Lib\Util\Str;
 
 /**
  * 数据库链接类

@@ -6,7 +6,7 @@
  * Time: 16:19
  */
 
-namespace Src\Core\WebSocket;
+namespace More\Src\Core\WebSocket;
 
 
 class DispatchException extends \Exception

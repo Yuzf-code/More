@@ -6,7 +6,7 @@
  * Time: 14:00
  */
 
-namespace Src\Lib\Redis;
+namespace More\Src\Lib\Redis;
 
 
 class ConnectionException extends \Exception

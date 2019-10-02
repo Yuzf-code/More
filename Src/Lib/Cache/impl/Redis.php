@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Lib\Cache\impl;
+namespace More\Src\Lib\Cache\impl;
 
 
-use Src\Core\App;
-use Src\Lib\Cache\Cache;
+use More\Src\Core\App;
+use More\Src\Lib\Cache\Cache;
 
 class Redis extends Cache
 {

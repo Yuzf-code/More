@@ -6,10 +6,10 @@
  * Time: 23:38
  */
 
-namespace Src\Lib\Pool;
+namespace More\Src\Lib\Pool;
 
 
-use Src\Core\ServiceProvider;
+use More\Src\Core\ServiceProvider;
 
 class PoolServiceProvider extends ServiceProvider
 {

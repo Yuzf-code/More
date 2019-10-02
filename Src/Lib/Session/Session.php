@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Lib\Session;
+namespace More\Src\Lib\Session;
 
 
 abstract class Session

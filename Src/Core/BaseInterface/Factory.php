@@ -6,7 +6,7 @@
  * Time: 19:33
  */
 
-namespace Src\Core\BaseInterface;
+namespace More\Src\Core\BaseInterface;
 
 
 interface Factory

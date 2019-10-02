@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Core\Swoole;
+namespace More\Src\Core\Swoole;
 
 
-use Src\Core\ServiceProvider;
+use More\Src\Core\ServiceProvider;
 
 class ServerManagerServiceProvider extends ServiceProvider
 {

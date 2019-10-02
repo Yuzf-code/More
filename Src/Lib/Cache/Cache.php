@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Lib\Cache;
+namespace More\Src\Lib\Cache;
 
 /**
  * Cache抽象类

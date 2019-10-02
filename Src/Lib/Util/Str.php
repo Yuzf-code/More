@@ -6,7 +6,7 @@
  * Time: 14:45
  */
 
-namespace Src\Lib\Util;
+namespace More\Src\Lib\Util;
 
 /**
  * 字符串工具类

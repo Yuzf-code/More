@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Core;
+namespace More\Src\Core;
 
-use Src\Core\BaseInterface\Singleton;
+use More\Src\Core\BaseInterface\Singleton;
 
 /**
  * 简单的IOC容器

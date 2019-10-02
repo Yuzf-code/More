@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Core\Route;
+namespace More\Src\Core\Route;
 
 
-use Src\Core\ServiceProvider;
-use Src\Lib\Config;
+use More\Src\Core\ServiceProvider;
+use More\Src\Lib\Config;
 
 class RouteServiceProvider extends ServiceProvider
 {

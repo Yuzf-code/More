@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Lib\Database\Relation;
+namespace More\Src\Lib\Database\Relation;
 
 
-use Src\Lib\Database\Model;
+use More\Src\Lib\Database\Model;
 
 class HasMany extends Relation
 {

@@ -6,7 +6,7 @@
  * Time: 22:11
  */
 
-namespace Src\Core;
+namespace More\Src\Core;
 
 
 abstract class ServiceProvider
