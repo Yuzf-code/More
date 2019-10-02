@@ -1,5 +1,5 @@
 <?php
-namespace Src;
+namespace More\Src;
 
 use More\Src\Core\Http\Request;
 use More\Src\Core\Http\Response;
