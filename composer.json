@@ -1,5 +1,5 @@
 {
-    "name": "Roki/More",
+    "name": "roki/more",
     "description": "A Swoole MVC Framework ",
 
     "autoload": {
