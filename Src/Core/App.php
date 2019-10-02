@@ -14,21 +14,20 @@ use Src\Lib\Redis\RedisManager;
  * @property RedisManager $redis
  * @property Logger $logger
  * @property ServerManager $serverManager
- * @package Weekii\Core
+ * @package Src\Core
  */
 class App extends Container
 {
+    protected $basePath;
+
     /**
      * 应用启动
      * @throws \Exception
      */
-    public function run ()
+    public function run ($basePath = null)
     {
-        define('WEEKII_ROOT', realpath(getcwd()));
-        define('PROJECT_ROOT', WEEKII_ROOT . '/../..');
-        define('CONFIG_PATH', PROJECT_ROOT . '/Config');
 
-        $this->init();
+        $this->init($basePath);
         $this->serverManager->start();
     }
 
@@ -36,11 +35,18 @@ class App extends Container
      * 应用初始化
      * @throws \Exception
      */
-    private function init()
+    private function init($basePath = null)
     {
         ini_set("display_errors","0");
         error_reporting(0);
         \Swoole\Runtime::enableCoroutine();
+
+        if ($basePath) {
+            $this->setBasePath($basePath);
+        }
+
+        define('PROJECT_ROOT', $basePath);
+        define('CONFIG_PATH', PROJECT_ROOT . '/Config');
 
         if (file_exists(PROJECT_ROOT . '/GlobalEvent.php')) {
             require_once PROJECT_ROOT . '/GlobalEvent.php';
@@ -95,5 +101,12 @@ class App extends Container
         foreach ($boots as $boot) {
             $boot->boot();
         }
+    }
+
+    public function setBasePath($basePath)
+    {
+        $this->basePath = rtrim($basePath, '\/');
+
+        return $this;
     }
 }
