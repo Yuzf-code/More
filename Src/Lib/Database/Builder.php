@@ -93,6 +93,10 @@ class Builder
 
     public function getModel()
     {
+        if (empty($this->model)) {
+            throw new \Exception('model can not be null.');
+        }
+
         return $this->model;
     }
 
@@ -229,16 +233,15 @@ class Builder
         return $this;
     }
 
+    /**
+     * 获取模型主键
+     * @return string
+     * @throws \Exception
+     */
     protected function getPrimaryKey()
     {
-        if (empty($this->getModel())) {
-            throw new \Exception('Model is null. Can not get primaryKey.');
-        }
-
         return $this->getModel()->getPrimaryKey();
     }
-
-
 
     /**
      * 获取多条
@@ -437,14 +440,17 @@ class Builder
      * @param array $column
      * @param \Closure|null $helper
      * @return $this
+     * @throws \Exception
      */
     public function with($relationship, array $column = ['*'], \Closure $helper = null)
     {
-        if (!method_exists($this, $relationship)) {
+        $model = $this->getModel();
+
+        if (!method_exists($model, $relationship)) {
             throw new \Exception("relationship method not found.");
         }
 
-        $relation = $this->$relationship();
+        $relation = $model->$relationship();
 
         if (!$relation instanceof Relation) {
             throw new \Exception("relationship method must return an Relation instance.");
