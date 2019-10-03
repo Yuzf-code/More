@@ -421,7 +421,7 @@ class Builder
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
     {
-        return $this->join($table, $first, $operator = null, $second = null, 'LEFT');
+        return $this->join($table, $first, $operator, $second , 'LEFT');
     }
 
     /**
@@ -435,7 +435,7 @@ class Builder
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
     {
-        return $this->join($table, $first, $operator = null, $second = null, 'RIGHT');
+        return $this->join($table, $first, $operator, $second, 'RIGHT');
     }
 
     /**
