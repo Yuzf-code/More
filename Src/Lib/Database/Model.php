@@ -6,7 +6,6 @@ namespace More\Src\Lib\Database;
 use More\Src\Core\App;
 use More\Src\Lib\Database\Relation\HasMany;
 use More\Src\Lib\Database\Relation\HasOne;
-use More\Src\Lib\Database\Relation\Relation;
 
 class Model implements \ArrayAccess
 {
@@ -47,40 +46,10 @@ class Model implements \ArrayAccess
     protected $resultType = self::RESULT_TYPE_ARRAY;
 
     /**
-     * where条件
-     * @var array
+     * 查询构造器
+     * @var Builder
      */
-    protected $conditions = [];
-
-    /**
-     * 参数绑定
-     * @var array
-     */
-    protected $bindings = [];
-
-    /**
-     * limit参数
-     * @var array
-     */
-    protected $limit = [];
-
-    /**
-     * orderBy参数
-     * @var array
-     */
-    protected $orderBy = [];
-
-    /**
-     * groupBy参数
-     * @var array
-     */
-    protected $groupBy = [];
-
-    /**
-     * 模型关联
-     * @var array
-     */
-    protected $relationships = [];
+    protected $builder;
 
     /**
      * 数据集
@@ -102,93 +71,36 @@ class Model implements \ArrayAccess
         }
     }
 
-    /**
-     * 条件where子条件
-     * @return $this
-     */
-    public function where()
+    public function getPrimaryKey()
     {
-        $paramsNum = func_num_args();
-        $params = func_get_args();
-
-        if ($paramsNum == 2) {
-            $this->addCondition('AND', $this->newPattern($params[0], '=', $params[1]) );
-        } elseif ($paramsNum == 3) {
-            $this->addCondition('AND', $this->newPattern($params[0], $params[1], $params[2]));
-        }
-
-        return $this;
+        return $this->primaryKey;
     }
 
     /**
-     * 根据主键获取一条记录
+     * 获取查询构造器
+     * @return Builder
+     */
+    protected function newBuilder()
+    {
+        $builder = new Builder();
+        $builder->setAdapter($this->adapter);
+        $builder->setDb($this->db);
+        $builder->setModel($this);
+        $builder->setResultType($this->resultType);
+        $builder->setTable($this->table);
+
+        return $builder;
+    }
+
+    /**
+     * 根据ID获取一条数据
      * @param $id
      * @param array $column
-     * @return $this
+     * @return array|Model
      */
     public function find($id, $column = ['*'])
     {
-        return $this->where($this->primaryKey, $id)->first($column);
-    }
-
-    /**
-     * 获取多条
-     * @param array $column
-     * @return mixed
-     */
-    public function get($column = ['*'])
-    {
-        return $this->run($this->generateSelectSQL($column), $this->bindings, function ($sql, $bindings) {
-            $result =  $this->db->select($sql, $bindings);
-
-            // 处理结果集
-            foreach ($result as $index => $item) {
-                // 使用model返回
-                if ($this->resultType == self::RESULT_TYPE_MODEL) {
-                    // 结果集转换为为model对象
-                    $result[$index] = $this->resultToModel($item);
-                }
-
-                $this->loadRelationship($result[$index]);
-            }
-
-            return $result;
-        });
-    }
-
-    /**
-     * 获取一条
-     * @param array $column
-     * @return $this | array
-     */
-    public function first($column = ['*'])
-    {
-        $this->take(1);
-
-        $this->data = $this->run($this->generateSelectSQL($column), $this->bindings, function ($sql, $bindings) {
-            return $this->db->selectOne($sql, $bindings);
-        });
-
-        // handle relationship
-        $this->loadRelationship($this->data);
-
-        if ($this->resultType == self::RESULT_TYPE_MODEL) {
-            return $this;
-        } else {
-            return $this->data;
-        }
-    }
-
-    /**
-     * 插入数据
-     * @param array $data
-     * @return mixed
-     */
-    public function insert(array $data)
-    {
-        return $this->run($this->generateInsertSQL($data), $this->bindings, function ($sql, $bindings) {
-            return $this->db->insert($sql, $bindings);
-        });
+        return $this->newBuilder()->where($this->primaryKey, $id)->first($column);
     }
 
     /**
@@ -197,21 +109,7 @@ class Model implements \ArrayAccess
      */
     public function add()
     {
-        return $this->run($this->generateInsertSQL($this->data), $this->bindings, function ($sql, $bindings) {
-            return $this->db->insert($sql, $bindings);
-        });
-    }
-
-    /**
-     * 更新数据
-     * @param array $data
-     * @return mixed
-     */
-    public function update(array $data)
-    {
-        return $this->run($this->generateUpdateSQL($data), $this->bindings, function ($sql, $bindings) {
-            return $this->db->update($sql, $bindings);
-        });
+        return $this->newBuilder()->insert($this->data);
     }
 
     /**
@@ -220,11 +118,7 @@ class Model implements \ArrayAccess
      */
     public function save()
     {
-        $this->where($this->primaryKey, $this->data[$this->primaryKey]);
-
-        return $this->run($this->generateUpdateSQL($this->data), $this->bindings, function ($sql, $bindings) {
-            return $this->db->update($sql, $bindings);
-        });
+        return $this->newBuilder()->where($this->primaryKey, $this->data[$this->primaryKey])->update($this->data);
     }
 
     /**
@@ -235,61 +129,12 @@ class Model implements \ArrayAccess
      */
     public function delete($id = null)
     {
+        $builder = $this->newBuilder();
         if (!is_null($id)) {
-            $this->where($this->primaryKey, $id);
+            $builder->where($this->primaryKey, $id);
         }
 
-        if (empty($this->conditions)) {
-            throw new \Exception('Method delete() must has conditions');
-        }
-
-        return $this->run($this->generateDeleteSQL(), $this->bindings, function ($sql, $bindings) {
-            return $this->db->delete($sql, $bindings);
-        });
-    }
-
-    /**
-     * 排序
-     * @param $field
-     * @param $type
-     */
-    public function orderBy($field, $type)
-    {
-        $this->orderBy[] = compact('field', 'type');
-        return $this;
-    }
-
-    /**
-     * 分组
-     * @param mixed ...$fields
-     */
-    public function groupBy(...$fields)
-    {
-        $this->groupBy = $fields;
-        return $this;
-    }
-
-    /**
-     * count
-     * @param $field
-     * @param string $alias
-     * @return int
-     */
-    public function count($field, $alias = '')
-    {
-        $field = 'COUNT(' . $field . ')';
-
-        if (!empty($alias)) {
-            $field .= ' AS ' . $alias;
-        } else {
-            $alias = $field;
-        }
-
-        $result = $this->run($this->generateSelectSQL([$field]), $this->bindings, function ($sql, $bindings) {
-            return $this->db->selectOne($sql, $bindings);
-        });
-
-        return $result[$alias];
+        return $builder->delete();
     }
 
     /**
@@ -316,311 +161,6 @@ class Model implements \ArrayAccess
         return new HasMany($related, $foreignKey, $localKey);
     }
 
-    /**
-     * 注册关联模型方法
-     * @param $relationship
-     * @param array $column
-     * @param \Closure|null $helper
-     * @return $this
-     */
-    public function with($relationship, array $column = ['*'], \Closure $helper = null)
-    {
-        if (!method_exists($this, $relationship)) {
-            throw new \Exception("relationship method not found.");
-        }
-
-        $relation = $this->$relationship();
-
-        if (!$relation instanceof Relation) {
-            throw new \Exception("relationship method must return an Relation instance.");
-        }
-
-        $this->addRelationship($relationship, $relation, $column, $helper);
-
-        return $this;
-    }
-
-    /**
-     * 添加关联关系
-     * @param $relationship
-     * @param Relation $relation
-     * @param array $column
-     */
-    public function addRelationship($relationship, Relation $relation, array $column = ['*'], \Closure $helper = null)
-    {
-        $this->relationships[$relationship] = compact('relation', 'column', 'helper');
-    }
-
-    /**
-     * 挂载关联模型数据
-     * @param array | Model $row
-     */
-    protected function loadRelationship(&$row)
-    {
-        foreach ($this->relationships as $key => $item) {
-            $row[$key] = $item['relation']->getResult($row, $item['column'], $item['helper']);
-        }
-    }
-
-    /**
-     * 获取指定行数数据
-     * @param $row
-     */
-    public function take($row)
-    {
-        $this->limit(0, $row);
-        return $this;
-    }
-
-    /**
-     * @param $start
-     * @param $size
-     */
-    public function limit($start, $row)
-    {
-        $this->limit = [
-            $start,
-            $row
-        ];
-
-        return $this;
-    }
-
-    /**
-     * 结果转换为Model实例
-     * @param $result
-     * @return mixed
-     * @throws \Exception
-     */
-    public function resultToModel($result)
-    {
-        $modelInstance = App::getInstance()->make(static::class);
-        $modelInstance->setData($result);
-        return $modelInstance;
-    }
-
-    /**
-     * 执行查询
-     * @param $sql
-     * @param $bindings
-     * @param \Closure $callback
-     * @return mixed
-     */
-    protected function run($sql, $bindings, \Closure $callback)
-    {
-        $result = $callback($sql, $bindings);
-
-        // 重置
-        $this->reset();
-        return $result;
-    }
-
-    /**
-     * 生成delete语句
-     * @return string
-     */
-    protected function generateDeleteSQL()
-    {
-        $sql = 'DELETE FROM ' . $this->getTableName() . $this->generateConditionsSQL();
-        return $sql;
-    }
-
-    /**
-     * 生成update语句
-     * @param array $data
-     * @return string
-     */
-    protected function generateUpdateSQL(array $data)
-    {
-        $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
-        $setFields = [];
-        foreach ($data as $field => $value) {
-            $this->prepareBindings($value);
-            $setFields[] = $field . ' = ' . $value;
-        }
-
-        $sql .= implode(', ', $setFields) . $this->generateConditionsSQL();
-        return $sql;
-    }
-
-    /**
-     * 生成limit语句
-     * @return string
-     */
-    protected function generateLimitSQL()
-    {
-        $sql = '';
-        if (!empty($this->limit)) {
-            $this->prepareBindings($this->limit[0]);
-            $this->prepareBindings($this->limit[1]);
-            $sql = ' LIMIT ' . $this->limit[0] . ', ' . $this->limit[1];
-        }
-        return $sql;
-    }
-
-    /**
-     * 生成groupBy语句
-     * @return string
-     */
-    protected function generateGroupBySQL()
-    {
-        $sql = '';
-        if (!empty($this->groupBy)) {
-            array_walk($this->groupBy, function (&$field, $index) {
-                $this->prepareBindings($field);
-            });
-
-            $sql = ' GROUP BY ' . implode(', ', $this->groupBy);
-        }
-        return $sql;
-    }
-
-    /**
-     * 生成orderBy语句
-     * @return mixed|string
-     */
-    protected function generateOrderBySQL()
-    {
-        if (empty($this->orderBy)) {
-            return '';
-        }
-
-        $initial = ' ORDER BY ';
-        return array_reduce($this->orderBy, function ($carry, $item) use ($initial) {
-            if ($carry != $initial) {
-                $carry .= ', ';
-            }
-
-            $this->prepareBindings($item['field']);
-            $this->prepareBindings($item['type']);
-
-            return $carry . $item['field'] . ' ' . $item['type'];
-
-        }, $initial);
-    }
-
-    protected function reset()
-    {
-        $this->resetConditions();
-        $this->resetBindings();
-        $this->resetLimit();
-    }
-
-    protected function resetConditions()
-    {
-        $this->conditions = [];
-    }
-
-    protected function resetBindings()
-    {
-        $this->bindings = [];
-    }
-
-    protected function resetLimit()
-    {
-        $this->limit;
-    }
-
-    /**
-     * 添加条件
-     * @param $type
-     * @param $pattern
-     */
-    protected function addCondition($type, $pattern)
-    {
-        if (empty($this->conditions)) {
-            $type = '';
-        }
-        $this->conditions[] = compact('type', 'pattern');
-    }
-
-    /**
-     * 生成表达式
-     * @param $column
-     * @param $operator
-     * @param $value
-     * @return array
-     */
-    protected function newPattern($column, $operator, $value)
-    {
-        return [
-            $column,
-            $operator,
-            $value
-        ];
-    }
-
-    /**
-     * 生成SQL条件语句
-     * @return string
-     */
-    protected function generateConditionsSQL()
-    {
-        if (empty($this->conditions)) {
-            return '';
-        }
-
-        $sql = ' WHERE';
-        foreach ($this->conditions as $condition) {
-            $this->prepareBindings($condition['pattern'][2]);
-
-            $sql .= ' ' . $condition['type'] . ' ' . implode(' ', $condition['pattern']);
-        }
-
-        return $sql;
-    }
-
-    /**
-     * 生成查询语句
-     * @param array $column
-     * @return string
-     */
-    protected function generateSelectSQL($column = ['*'])
-    {
-        $sql = 'SELECT ' . implode(',', $column) . ' FROM ' . $this->getTableName()
-            . $this->generateConditionsSQL()
-            . $this->generateGroupBySQL()
-            . $this->generateOrderBySQL()
-            . $this->generateLimitSQL();
-
-        return $sql;
-    }
-
-    /**
-     * 生成insert语句
-     * @param array $data
-     * @return string
-     */
-    protected function generateInsertSQL(array $data)
-    {
-        $fields = array_keys($data);
-        $values = array_values($data);
-        $this->prepareBindings($values);
-
-
-        $sql = 'INSERT INTO ' . $this->getTableName() . ' (' . implode(',', $fields) . ') VALUES ' . $values;
-        return $sql;
-    }
-
-    /**
-     * 预处理参数绑定相关
-     * @param $pattern
-     */
-    protected function prepareBindings(&$param)
-    {
-        if (is_array($param)) {
-            foreach ($param as $index => $item) {
-                $this->bindings[] = $item;
-                $param[$index] = '?';
-            }
-
-            $param = '(' . implode(',', $param) . ')';
-        } else {
-            $this->bindings[] = $param;
-            $param = '?';
-        }
-    }
-
     public function setData(array $data)
     {
         $this->data = $data;
@@ -629,6 +169,11 @@ class Model implements \ArrayAccess
     public function getData()
     {
         return $this->data;
+    }
+
+    public function getClassName()
+    {
+        return static::class;
     }
 
     /**
@@ -643,17 +188,31 @@ class Model implements \ArrayAccess
     }
 
     /**
-     * 获取表名
-     * @return string
+     * 动态调用查询构造器方法
+     * @param $method
+     * @param $parameters
+     * @return mixed
      */
-    public function getTableName()
+    public function __call($method, $parameters)
     {
-        return $this->db->tableName($this->table);
+        return $this->newBuilder()->$method(...$parameters);
     }
 
-    public function toJson()
+    /**
+     * 与__call方法配合，实现静态调用查询构造器方法
+     * @param $method
+     * @param $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters)
     {
-        return json_encode($this->data);
+        return (new static)->$method(...$parameters);
+    }
+
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->data, $options);
     }
 
     public function __get($name)
