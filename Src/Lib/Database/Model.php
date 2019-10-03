@@ -109,6 +109,9 @@ class Model implements \ArrayAccess
      */
     public function add()
     {
+        if (empty($this->data)) {
+            throw new \Exception('No properties set. Can not use add()');
+        }
         return $this->newBuilder()->insert($this->data);
     }
 
@@ -118,6 +121,10 @@ class Model implements \ArrayAccess
      */
     public function save()
     {
+        if (!isset($this->data[$this->primaryKey])) {
+            throw new \Exception('No primary key set. Can not use save()');
+        }
+
         return $this->newBuilder()->where($this->primaryKey, $this->data[$this->primaryKey])->update($this->data);
     }
 
