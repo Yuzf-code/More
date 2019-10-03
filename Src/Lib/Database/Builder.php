@@ -541,8 +541,7 @@ class Builder
         $result = $callback($sql, $bindings);
 
         // 重置
-        // TODO 暂时先注释掉
-        //$this->reset();
+        $this->reset();
         return $result;
     }
 
