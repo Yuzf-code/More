@@ -17,10 +17,6 @@ class HasOne extends Relation
     {
         $this->setParent($parent);
         $this->addConditions($helper);
-        $result = $this->related->first($column);
-
-        $this->related->reset();
-
-        return $result;
+        return $this->related->first($column);
     }
 }
