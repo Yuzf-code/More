@@ -398,7 +398,7 @@ class Builder
         if ($first instanceof \Closure) {
             call_user_func($first, $builder);
         } else {
-            $builder->where($first, $operator, $second);
+            $builder->whereRaw($first . $operator . $second);
         }
 
         $this->joins[] = [
