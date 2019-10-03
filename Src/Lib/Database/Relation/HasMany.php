@@ -17,6 +17,10 @@ class HasMany extends Relation
     {
         $this->setParent($parent);
         $this->addConditions($helper);
-        return $this->related->get($column);
+        $result = $this->related->get($column);
+
+        $this->related->resetBindings();
+
+        return $result;
     }
 }

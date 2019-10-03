@@ -630,7 +630,7 @@ class Builder
         }, $initial);
     }
 
-    protected function reset()
+    public function reset()
     {
         $this->resetConditions();
         $this->resetBindings();
@@ -641,37 +641,37 @@ class Builder
         $this->resetRelationship();
     }
 
-    protected function resetConditions()
+    public function resetConditions()
     {
         $this->conditions = [];
     }
 
-    protected function resetBindings()
+    public function resetBindings()
     {
         $this->bindings = [];
     }
 
-    protected function resetLimit()
+    public function resetLimit()
     {
         $this->limit = [];
     }
 
-    protected function resetGroupBy()
+    public function resetGroupBy()
     {
         $this->groupBy = [];
     }
 
-    protected function resetOrderBy()
+    public function resetOrderBy()
     {
         $this->orderBy = [];
     }
 
-    protected function resetJoins()
+    public function resetJoins()
     {
         $this->joins = [];
     }
 
-    protected function resetRelationship()
+    public function resetRelationship()
     {
         $this->relationships = [];
     }
