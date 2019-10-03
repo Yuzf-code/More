@@ -284,8 +284,12 @@ class Builder
         // handle relationship
         $this->loadRelationship($data);
 
-        if ($this->resultType == self::RESULT_TYPE_MODEL) {
+        // 为了可以方便的使用$model->save() 还是直接set一下
+        if (!empty($this->model)) {
             $this->getModel()->setData($data);
+        }
+
+        if ($this->resultType == self::RESULT_TYPE_MODEL) {
             return $this->getModel();
         } else {
             return $data;
@@ -761,7 +765,7 @@ class Builder
         $sql = '';
 
         foreach ($this->joins as $item) {
-            $sql .= ' ' . $item['type'] . ' JOIN ' . $item['table'] . $item['builder']->generateConditionsSQL(false);
+            $sql .= ' ' . $item['type'] . ' JOIN ' . $this->db->tableName($item['table']) . $item['builder']->generateConditionsSQL(false);
         }
 
         return $sql;
