@@ -766,6 +766,7 @@ class Builder
 
         foreach ($this->joins as $item) {
             $sql .= ' ' . $item['type'] . ' JOIN ' . $this->db->tableName($item['table']) . $item['builder']->generateConditionsSQL(false);
+            $this->addBindings($item['builder']->getBindings());
         }
 
         return $sql;
@@ -787,6 +788,22 @@ class Builder
         return $sql;
     }
 
+    public function getBindings()
+    {
+        return $this->bindings;
+    }
+
+    public function addBindings($value)
+    {
+        if (is_array($value)) {
+            $this->bindings = array_merge($this->bindings, $value);
+        } else {
+            $this->bindings[] = $value;
+        }
+
+        return $this;
+    }
+
     /**
      * 预处理参数绑定相关
      * @param $pattern
@@ -795,13 +812,13 @@ class Builder
     {
         if (is_array($param)) {
             foreach ($param as $index => $item) {
-                $this->bindings[] = $item;
+                $this->addBindings($item);
                 $param[$index] = '?';
             }
 
             $param = '(' . implode(',', $param) . ')';
         } else {
-            $this->bindings[] = $param;
+            $this->addBindings($param);
             $param = '?';
         }
     }
