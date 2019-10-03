@@ -4,6 +4,7 @@ namespace More\Src\Lib\Database\Relation;
 
 
 use More\Src\Core\App;
+use More\Src\Lib\Database\Builder;
 use More\Src\Lib\Database\Model;
 
 abstract class Relation
@@ -27,8 +28,8 @@ abstract class Relation
     protected $parent;
 
     /**
-     * 目标模型
-     * @var Model
+     * 目标模型查询构造器
+     * @var Builder
      */
     protected $related;
 
@@ -38,7 +39,8 @@ abstract class Relation
         $this->foreignKey = $foreignKey;
         $this->localKey = $localKey;
 
-        $this->related = $this->newInstance($related);
+        $model = $this->newInstance($related);
+        $this->related = $model->newBuilder();
     }
 
     /**
@@ -63,7 +65,7 @@ abstract class Relation
         if (!is_null($helper)) {
             // 可以通过helper自定义过多筛选条件
             // parent为自身数据，类型取决于结果集类型配置（数组或Model对象）
-            // related为目标模型
+            // related为目标模型查询构造器
             // 如：$related->where('field', $parent->field)
             $helper($this->parent, $this->related);
         }

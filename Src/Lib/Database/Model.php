@@ -80,7 +80,7 @@ class Model implements \ArrayAccess
      * 获取查询构造器
      * @return Builder
      */
-    protected function newBuilder()
+    public function newBuilder()
     {
         $builder = new Builder();
         $builder->setAdapter($this->adapter);
