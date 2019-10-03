@@ -19,7 +19,7 @@ class HasOne extends Relation
         $this->addConditions($helper);
         $result = $this->related->first($column);
 
-        $this->related->resetBindings();
+        $this->related->reset();
 
         return $result;
     }
