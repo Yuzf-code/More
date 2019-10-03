@@ -382,6 +382,18 @@ class Builder
     }
 
     /**
+     * join操作的on条件
+     * @param $first
+     * @param $operator
+     * @param $second
+     * @return Builder
+     */
+    public function on($first, $operator, $second)
+    {
+        return $this->whereRaw($first . $operator . $second);
+    }
+
+    /**
      * join操作，默认为inner join
      * @param $table
      * @param string $first
@@ -398,7 +410,7 @@ class Builder
         if ($first instanceof \Closure) {
             call_user_func($first, $builder);
         } else {
-            $builder->whereRaw($first . $operator . $second);
+            $builder->on($first, $operator, $second);
         }
 
         $this->joins[] = [
