@@ -324,7 +324,7 @@ class Builder
      */
     public function delete()
     {
-        if (empty($this->conditions)) {
+        if (!$this->hasConditions()) {
             throw new \Exception('Method delete() must has conditions');
         }
 
@@ -481,6 +481,15 @@ class Builder
         foreach ($this->relationships as $key => $item) {
             $row[$key] = $item['relation']->getResult($row, $item['column'], $item['helper']);
         }
+    }
+
+    /**
+     * 是否已经添加过查询条件
+     * @return bool
+     */
+    public function hasConditions()
+    {
+        return !empty($this->conditions);
     }
 
     /**

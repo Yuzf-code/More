@@ -59,6 +59,11 @@ abstract class Relation
      */
     public function addConditions(\Closure $helper = null)
     {
+        // 如果已经有过条件就不需要重新去加了
+        if ($this->related->hasConditions()) {
+            return;
+        }
+
         // 添加基础的主键关联条件
         $this->related->where($this->foreignKey, $this->getLocalKeyValue());
 
