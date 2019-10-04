@@ -9,7 +9,21 @@ use More\Src\Lib\Database\Relation\HasOne;
 
 /**
  * Class Model
- * @method Builder
+ * @method static Builder where()
+ * @method static Builder orWhere()
+ * @method static Builder whereRaw($sql, $bindings = [])
+ * @method static Builder orWhereRaw($sql, $bindings = [])
+ * @method static mixed get($column = ['*'])
+ * @method static mixed first($column = ['*'])
+ * @method static Builder orderBy($field, $type)
+ * @method static Builder groupBy(...$fields)
+ * @method static int count($field, $alias = '')
+ * @method static Builder join($table, $first, $operator = null, $second = null, $type = 'INNER')
+ * @method static Builder leftJoin($table, $first, $operator = null, $second = null)
+ * @method static Builder rightJoin($table, $first, $operator = null, $second = null)
+ * @method static Builder with($relationship, array $column = ['*'], \Closure $helper = null)
+ * @method static Builder take($row)
+ * @method static Builder limit($start, $row)
  * @package More\Src\Lib\Database
  */
 class Model implements \ArrayAccess
