@@ -16,6 +16,7 @@ use More\Src\Lib\Pool\Pool;
  * @method insert($query, $bindings = [])
  * @method update($query, $bindings = [])
  * @method delete($query, $bindings = [])
+ * @method lastInsertId($name = null)
  * @package Weekii\Lib\Database
  */
 class DB

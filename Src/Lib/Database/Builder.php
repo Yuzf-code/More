@@ -299,7 +299,7 @@ class Builder
     /**
      * 插入数据
      * @param array $data
-     * @return mixed
+     * @return bool
      */
     public function insert(array $data)
     {
@@ -309,9 +309,18 @@ class Builder
     }
 
     /**
+     * 获取上一条插入的id
+     * @return mixed
+     */
+    public function lastInsertId($name = null)
+    {
+        return $this->db->lastInsertId($name);
+    }
+
+    /**
      * 更新数据
      * @param array $data
-     * @return mixed
+     * @return int 返回受影响行数
      */
     public function update(array $data)
     {
@@ -323,7 +332,7 @@ class Builder
     /**
      * 删除数据
      * @param null $id
-     * @return mixed
+     * @return int 返回受影响行数
      * @throws \Exception
      */
     public function delete()

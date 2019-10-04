@@ -7,6 +7,11 @@ use More\Src\Core\App;
 use More\Src\Lib\Database\Relation\HasMany;
 use More\Src\Lib\Database\Relation\HasOne;
 
+/**
+ * Class Model
+ * @method Builder
+ * @package More\Src\Lib\Database
+ */
 class Model implements \ArrayAccess
 {
     /**
@@ -105,14 +110,22 @@ class Model implements \ArrayAccess
 
     /**
      * 使用当前对象插入一条数据
-     * @return mixed
+     * @return bool
      */
     public function add()
     {
         if (empty($this->data)) {
             throw new \Exception('No properties set. Can not use add()');
         }
-        return $this->newBuilder()->insert($this->data);
+
+        $builder = $this->newBuilder();
+        $success = $builder->insert($this->data);
+
+        if ($success) {
+            $this->data[$this->primaryKey] = $builder->lastInsertId($this->primaryKey);
+        }
+
+        return $success;
     }
 
     /**

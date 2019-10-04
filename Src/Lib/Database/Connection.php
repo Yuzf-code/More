@@ -13,7 +13,10 @@ use More\Src\Lib\Util\Str;
  */
 class Connection
 {
-    // 链接句柄
+    /**
+     * 连接句柄
+     * @var \PDO
+     */
     protected $pdo;
 
     // 配置项
@@ -111,6 +114,16 @@ class Connection
 
             return $statement->execute();
         });
+    }
+
+    /**
+     * 获取上次insert的id
+     * @param null $name
+     * @return string
+     */
+    public function lastInsertId($name = null)
+    {
+        return $this->pdo->lastInsertId($name);
     }
 
     /**
