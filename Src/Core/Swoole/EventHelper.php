@@ -30,7 +30,7 @@ class EventHelper
         $register->set($register::onRequest, function (\swoole_http_request $swooleRequest, \swoole_http_response $swooleResponse) use ($dispatcher, $app) {
             $request = new Request($swooleRequest);
             $response = new Response($swooleResponse);
-            $view = new BladeInstance(PROJECT_ROOT . '/App/Http/View', Config::getInstance()->get('app')['tempDir'] . '/templates');
+            $view = new BladeInstance(PROJECT_ROOT . '/App/View', Config::getInstance()->get('app')['tempDir'] . '/templates');
             try {
                 GlobalEvent::onRequest($request, $response);
                 $dispatcher->dispatch($request, $response, $view);
