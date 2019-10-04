@@ -95,10 +95,19 @@ class EventHelper
     }
 
     /**
+     * 注册用户自定义错误处理
+     * @param callable $handler
+     */
+    public static function registerErrorHandler(callable $handler)
+    {
+        App::getInstance()->instance(Constant::USER_ERROR_HANDLER, $handler);
+    }
+
+    /**
      * 注册用户自定义http dispatch 时异常handler
      * @param \Closure $handler
      */
-    public static function registerOnRequestExceptionHandler(\Closure $handler)
+    public static function registerOnRequestExceptionHandler(callable $handler)
     {
         App::getInstance()->instance(Constant::HTTP_REQUEST_EXCEPTION_HANDLER, $handler);
     }
@@ -107,7 +116,7 @@ class EventHelper
      * 注册用户自定义websocket dispatch 时异常handler
      * @param \Closure $handler
      */
-    public static function registerOnMessageExceptionHandler(\Closure $handler)
+    public static function registerOnMessageExceptionHandler(callable $handler)
     {
         App::getInstance()->instance(Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER, $handler);
     }
