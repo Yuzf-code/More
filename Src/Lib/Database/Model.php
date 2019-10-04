@@ -26,7 +26,7 @@ use More\Src\Lib\Database\Relation\HasOne;
  * @method static Builder limit($start, $row)
  * @package More\Src\Lib\Database
  */
-class Model implements \ArrayAccess
+class Model implements \ArrayAccess, \JsonSerializable
 {
     /**
      * 查询结果集返回类型
@@ -243,10 +243,19 @@ class Model implements \ArrayAccess
         return (new static)->$method(...$parameters);
     }
 
+    public function jsonSerialize()
+    {
+        return $this->data;
+    }
 
     public function toJson($options = 0)
     {
-        return json_encode($this->data, $options);
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    public function __toString()
+    {
+        return $this->toJson(JSON_UNESCAPED_UNICODE^JSON_UNESCAPED_SLASHES);
     }
 
     public function __get($name)
@@ -271,11 +280,6 @@ class Model implements \ArrayAccess
     public function __unset($name)
     {
         unset($this->data[$name]);
-    }
-
-    public function __toString()
-    {
-        return $this->toJson();
     }
 
     /**

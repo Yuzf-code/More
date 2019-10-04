@@ -281,6 +281,11 @@ class Builder
             return $this->db->selectOne($sql, $bindings);
         });
 
+        // 没有数据直接返回null
+        if (empty($data)) {
+            return null;
+        }
+
         // handle relationship
         $this->loadRelationship($data);
 
