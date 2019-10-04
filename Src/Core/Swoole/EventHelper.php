@@ -93,4 +93,22 @@ class EventHelper
             }
         });
     }
+
+    /**
+     * 注册用户自定义http dispatch 时异常handler
+     * @param \Closure $handler
+     */
+    public static function registerOnRequestExceptionHandler(\Closure $handler)
+    {
+        App::getInstance()->instance(Constant::HTTP_REQUEST_EXCEPTION_HANDLER, $handler);
+    }
+
+    /**
+     * 注册用户自定义websocket dispatch 时异常handler
+     * @param \Closure $handler
+     */
+    public static function registerOnMessageExceptionHandler(\Closure $handler)
+    {
+        App::getInstance()->instance(Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER, $handler);
+    }
 }
