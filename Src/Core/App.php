@@ -37,11 +37,6 @@ class App extends Container
      */
     private function init($basePath = null)
     {
-        ini_set("display_errors","0");
-        error_reporting(0);
-
-        $this->errorHandle();
-
         \Swoole\Runtime::enableCoroutine();
 
         if ($basePath) {
@@ -60,6 +55,10 @@ class App extends Container
 
         GlobalEvent::frameInit();
 
+        ini_set("display_errors","0");
+        error_reporting(0);
+
+        $this->errorHandle();
     }
 
     private function errorHandle()
