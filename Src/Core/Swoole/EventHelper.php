@@ -4,6 +4,7 @@ namespace More\Src\Core\Swoole;
 
 use duncan3dc\Laravel\BladeInstance;
 use More\Src\Core\App;
+use More\Src\Core\Constant;
 use More\Src\Core\Http\Dispatcher;
 use More\Src\Core\Http\Request;
 use More\Src\Core\Http\Response;
@@ -38,7 +39,11 @@ class EventHelper
                 $app->db->freeConnection();
                 $app->redis->freeConnection();
             } catch (\Throwable $e) {
-                $app->logger->throwable($e);
+                if (isset($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER]) && is_callable($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER])) {
+                    call_user_func($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER], $e, $request, $response, $view);
+                } else {
+                    $app->logger->throwable($e);
+                }
             }
         });
     }
@@ -80,7 +85,11 @@ class EventHelper
                 $app->db->freeConnection();
                 $app->redis->freeConnection();
             } catch (\Throwable $e) {
-                $app->logger->throwable($e);
+                if (isset($app[Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER]) && is_callable($app[Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER])) {
+                    call_user_func($app[Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER], $e, $request, $server);
+                } else {
+                    $app->logger->throwable($e);
+                }
             }
         });
     }
