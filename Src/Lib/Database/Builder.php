@@ -277,28 +277,28 @@ class Builder
     {
         $this->take(1);
 
-        $data = $this->run($this->generateSelectSQL($column), $this->bindings, function ($sql, $bindings) {
-            return $this->db->selectOne($sql, $bindings);
+        return $this->run($this->generateSelectSQL($column), $this->bindings, function ($sql, $bindings) {
+            $data = $this->db->selectOne($sql, $bindings);
+
+            // 没有数据直接返回null
+            if (empty($data)) {
+                return null;
+            }
+
+            // handle relationship
+            $this->loadRelationship($data);
+
+            // 为了可以方便的使用$model->save() 还是直接set一下
+            if (!empty($this->model)) {
+                $this->getModel()->setData($data);
+            }
+
+            if ($this->resultType == self::RESULT_TYPE_MODEL) {
+                return $this->getModel();
+            } else {
+                return $data;
+            }
         });
-
-        // 没有数据直接返回null
-        if (empty($data)) {
-            return null;
-        }
-
-        // handle relationship
-        $this->loadRelationship($data);
-
-        // 为了可以方便的使用$model->save() 还是直接set一下
-        if (!empty($this->model)) {
-            $this->getModel()->setData($data);
-        }
-
-        if ($this->resultType == self::RESULT_TYPE_MODEL) {
-            return $this->getModel();
-        } else {
-            return $data;
-        }
     }
 
     /**
