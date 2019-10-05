@@ -5,9 +5,13 @@ namespace More\Src\Core;
 
 class Constant
 {
-    const HTTP_SERVER = "HTTP_SERVER";
+    // 服务类型
+    const HTTP_SERVER = 'HTTP_SERVER';
+    const WEBSOCKET_SERVER = 'WEBSOCKET_SERVER';
 
-    const WEBSOCKET_SERVER = "WEBSOCKET_SERVER";
+    // 请求类型
+    const HTTP_REQUEST = 'HTTP_REQUEST';
+    const WEBSOCKET_REQUEST = 'WEBSOCKET_REQUEST';
 
     // 用户自定义error handler
     const USER_ERROR_HANDLER = 'ERROR_HANDLER';

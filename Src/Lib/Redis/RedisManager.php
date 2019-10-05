@@ -4,7 +4,6 @@ namespace More\Src\Lib\Redis;
 
 
 use More\Src\Core\App;
-use More\Src\Lib\Config;
 use More\Src\Lib\Context\RedisContext;
 use More\Src\Lib\Pool\Pool;
 
@@ -24,7 +23,7 @@ class RedisManager
     public function __construct(App $app)
     {
         $this->app = $app;
-        $this->config = Config::getInstance()->get('app')['redis'];
+        $this->config = $this->app->get('redis.config');
 
         $poolSize = $this->getConfig('poolSize');
         $connectionFactory = $this->app->make(ConnectionFactory::class, [$this->config]);

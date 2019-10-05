@@ -7,8 +7,10 @@ use More\Src\Core\App;
 use More\Src\Core\Constant;
 use More\Src\Core\Http\Dispatcher;
 use More\Src\Core\Http\Request;
+use More\Src\Core\Http\RequestContext;
 use More\Src\Core\Http\Response;
 use More\Src\Core\WebSocket\Command;
+use More\Src\Core\WebSocket\CommandContext;
 use More\Src\Core\WebSocket\DispatchException;
 use More\Src\GlobalEvent;
 use More\Src\Lib\Config;
@@ -31,13 +33,13 @@ class EventHelper
             $request = new Request($swooleRequest);
             $response = new Response($swooleResponse);
             $view = new BladeInstance(PROJECT_ROOT . '/App/View', Config::getInstance()->get('app')['tempDir'] . '/templates');
+
+            RequestContext::set(Constant::HTTP_REQUEST, $request);
+
             try {
                 GlobalEvent::onRequest($request, $response);
                 $dispatcher->dispatch($request, $response, $view);
                 GlobalEvent::afterAction($request, $response);
-                // 释放连接
-                $app->db->freeConnection();
-                $app->redis->freeConnection();
             } catch (\Throwable $e) {
                 if (isset($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER]) && is_callable($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER])) {
                     call_user_func($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER], $e, $request, $response, $view);
@@ -45,6 +47,12 @@ class EventHelper
                     $app->logger->throwable($e);
                 }
             }
+
+            // 释放连接
+            $app->db->freeConnection();
+            $app->redis->freeConnection();
+            // 清空请求上下文保存的对象
+            RequestContext::delete();
         });
     }
 
@@ -81,9 +89,6 @@ class EventHelper
                 }
 
                 GlobalEvent::afterMessage($server, $request);
-                // 释放连接
-                $app->db->freeConnection();
-                $app->redis->freeConnection();
             } catch (\Throwable $e) {
                 if (isset($app[Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER]) && is_callable($app[Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER])) {
                     call_user_func($app[Constant::WEBSOCKET_MESSAGE_EXCEPTION_HANDLER], $e, $request, $server);
@@ -91,6 +96,12 @@ class EventHelper
                     $app->logger->throwable($e);
                 }
             }
+
+            // 释放连接
+            $app->db->freeConnection();
+            $app->redis->freeConnection();
+            // 清空请求上下文保存的对象
+            CommandContext::delete();
         });
     }
 

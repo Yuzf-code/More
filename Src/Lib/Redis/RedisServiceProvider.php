@@ -1,15 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: weeki
- * Date: 2019/6/6
- * Time: 14:06
- */
 
 namespace More\Src\Lib\Redis;
 
 
 use More\Src\Core\ServiceProvider;
+use More\Src\Lib\Config;
 
 class RedisServiceProvider extends ServiceProvider
 {
@@ -21,6 +16,10 @@ class RedisServiceProvider extends ServiceProvider
 
         $this->app->singleton('redis', function () {
             return new RedisManager($this->app);
+        });
+
+        $this->app->singleton('redis.config', function () {
+            return Config::getInstance()->get('app')['redis'];
         });
     }
 

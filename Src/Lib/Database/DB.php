@@ -5,7 +5,6 @@ namespace More\Src\Lib\Database;
 
 use More\Src\Core\App;
 use More\Src\Core\BaseInterface\Singleton;
-use More\Src\Lib\Config;
 use More\Src\Lib\Context\DBContext;
 use More\Src\Lib\Pool\Pool;
 
@@ -39,8 +38,8 @@ class DB
 
     public function __construct(App $app)
     {
-        $this->config = Config::getInstance()->get('app')['database'];
         $this->app = $app;
+        $this->config = $this->app->get('db.config');
     }
 
     public function getAdapter()

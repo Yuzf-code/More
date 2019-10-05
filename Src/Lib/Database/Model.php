@@ -4,6 +4,9 @@ namespace More\Src\Lib\Database;
 
 
 use More\Src\Core\App;
+use More\Src\Core\Constant;
+use More\Src\Core\Http\Request as HTTPRequest;
+use More\Src\Core\WebSocket\Command as WebsocketRequest;
 use More\Src\Lib\Database\Relation\HasMany;
 use More\Src\Lib\Database\Relation\HasOne;
 
@@ -69,6 +72,15 @@ class Model implements \ArrayAccess, \JsonSerializable
      * @var Builder
      */
     protected $builder;
+
+    /**
+     * 从请求加载数据时的字段映射
+     * [
+     *      $tableField => $request field
+     * ]
+     * @var array
+     */
+    protected $loadFromRequestFieldsMap = [];
 
     /**
      * 数据集
@@ -219,6 +231,42 @@ class Model implements \ArrayAccess, \JsonSerializable
     public function getConfig($key = '', $default = null)
     {
         return $this->db->getConfig($key, $default);
+    }
+
+    /**
+     * 从请求载入数据
+     * 本来考虑过直接放在构造函数，可是突然想起犹豫服务端协议的多样性，项目可能会同时使用多种request
+     * 所以做成了用户主动调用的形式
+     * @param string $type
+     * @return $this
+     * @throws \Exception
+     */
+    public function loadFromRequest($type = Constant::HTTP_REQUEST)
+    {
+        if (empty($this->loadFromRequestFieldsMap)) {
+            throw new \Exception('loadFromRequestFieldsMap can not be empty.');
+        }
+
+        $app = App::getInstance();
+        switch ($type) {
+            case Constant::HTTP_REQUEST:
+                $request = $app->get(HTTPRequest::class);
+                break;
+            case Constant::WEBSOCKET_REQUEST:
+                $request = $app->get(WebsocketRequest::class);
+                break;
+            default:
+                throw new \Exception('Unknow type ' . $type);
+        }
+
+        foreach ($this->loadFromRequestFieldsMap as $tableFieldName => $requestFiledName) {
+            // key存在时才载入
+            if ($request->exist($requestFiledName)) {
+                $this->data[$tableFieldName] = $request->get($requestFiledName);
+            }
+        }
+
+        return $this;
     }
 
     /**

@@ -28,5 +28,9 @@ class HttpServiceProvider extends ServiceProvider
             $server->set($conf['setting']);
             return $server;
         });
+
+        $this->app->bind(Request::class, function () {
+            return RequestContext::get(Constant::HTTP_REQUEST);
+        });
     }
 }

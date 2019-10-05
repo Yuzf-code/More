@@ -10,6 +10,7 @@ namespace More\Src\Lib\Database;
 
 
 use More\Src\Core\ServiceProvider;
+use More\Src\Lib\Config;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,10 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         $this->app->singleton('db', function () {
             return new DB($this->app);
+        });
+
+        $this->app->singleton('db.config', function () {
+            return Config::getInstance()->get('app')['database'];
         });
     }
 

@@ -36,6 +36,16 @@ class Request
         }
     }
 
+    /**
+     * check param exist.
+     * @param $key
+     * @return bool
+     */
+    public function exist($key)
+    {
+        return array_key_exists($key, $this->requestParams);
+    }
+
     public function setRequestParams($params)
     {
         $this->requestParams = $params;
