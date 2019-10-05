@@ -45,15 +45,21 @@ class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * 指定连接适配器
-     * @var
+     * @var string
      */
     protected $adapter;
 
     /**
      * 表名
-     * @var
+     * @var string
      */
     protected $table;
+
+    /**
+     * 别名
+     * @var string
+     */
+    protected $alias = '';
 
     /**
      * 主键
@@ -118,7 +124,13 @@ class Model implements \ArrayAccess, \JsonSerializable
         $builder->setDb($this->db);
         $builder->setModel($this);
         $builder->setResultType($this->resultType);
-        $builder->setTable($this->table);
+
+        $alias = $this->alias;
+        if (empty($this->alias)) {
+            $alias = $this->table;
+        }
+
+        $builder->setTable($this->table . ' AS ' . $alias);
 
         return $builder;
     }
@@ -216,6 +228,24 @@ class Model implements \ArrayAccess, \JsonSerializable
     {
         return $this->data;
     }
+
+    /**
+     * @return string
+     */
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    /**
+     * @param string $alias
+     */
+    public function setAlias(string $alias): void
+    {
+        $this->alias = $alias;
+    }
+
+
 
     public function getClassName()
     {
