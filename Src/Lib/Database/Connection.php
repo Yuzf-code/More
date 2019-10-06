@@ -291,6 +291,14 @@ class Connection
     }
 
     /**
+     * 重置操作(将连接释放到连接池中时需要重置一下属性)
+     */
+    public function reset()
+    {
+        $this->transactions = 0;
+    }
+
+    /**
      * 查询预处理
      * @param $query
      * @param array $bindings

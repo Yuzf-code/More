@@ -13,8 +13,8 @@ use More\Src\Lib\Database\Relation\HasOne;
 /**
  * Class Model
  * @method Builder insert(array $data)
- * @method static Builder where()
- * @method static Builder orWhere()
+ * @method static Builder where(...$conditions)
+ * @method static Builder orWhere(...$conditions)
  * @method static Builder whereRaw($sql, $bindings = [])
  * @method static Builder orWhereRaw($sql, $bindings = [])
  * @method static mixed get($column = ['*'])

@@ -157,6 +157,7 @@ class DB
         $connectionList = DBContext::get(self::CONNECTION);
 
         foreach ($connectionList as $adapter => $connection) {
+            $connection->reset();
             $this->pool[$adapter]->push($connection);
         }
 
