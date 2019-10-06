@@ -480,14 +480,13 @@ class Builder
      */
     public function delete()
     {
-        if (!$this->hasConditions()) {
-            throw new \Exception('Method delete() must has conditions');
-        }
-
-
         // 有主键的话，自动添加主键条件
         if ($this->model->getKey() !== null) {
             $this->where($this->model->getPrimaryKey(), $this->model->getKey());
+        }
+
+        if (!$this->hasConditions()) {
+            throw new \Exception('Method delete() must has conditions');
         }
 
         if ($this->softDelete) {
