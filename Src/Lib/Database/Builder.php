@@ -191,6 +191,9 @@ class Builder
      */
     public function getAlias(): string
     {
+        if (empty($this->alias)) {
+            return $this->table;
+        }
         return $this->alias;
     }
 
@@ -216,7 +219,7 @@ class Builder
 
         $tableName = $this->db->tableName($this->table);
 
-        if ($withAlias && !empty($this->alias)) {
+        if ($withAlias) {
             $tableName .= ' AS ' . $this->alias;
         }
 
@@ -319,7 +322,7 @@ class Builder
         }
 
         $operate = $this->softDeleteQueryType == self::SOFT_DELETE_QUERY_TYPE_ONLY_DELETED ? ' IS NOT NULL' : ' IS NULL';
-        $this->whereRaw($this->getTableName(false) . '.' . $this->deleteDate . $operate);
+        $this->whereRaw($this->getAlias() . '.' . $this->deleteDate . $operate);
     }
 
     /**
