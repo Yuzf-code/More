@@ -29,6 +29,7 @@ use More\Src\Lib\Database\Relation\HasOne;
  * @method static Builder with($relationship, array $column = ['*'], \Closure $helper = null)
  * @method static Builder take($row)
  * @method static Builder limit($start, $row)
+ * @method static int destroy(...$ids)
  * @package More\Src\Lib\Database
  */
 class Model implements \ArrayAccess, \JsonSerializable
