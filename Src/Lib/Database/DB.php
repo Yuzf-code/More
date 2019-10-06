@@ -16,6 +16,13 @@ use More\Src\Lib\Pool\Pool;
  * @method update($query, $bindings = [])
  * @method delete($query, $bindings = [])
  * @method lastInsertId($name = null)
+ * @method transaction(\Closure $callback, $attempts = 1)
+ * @method beginTransaction()
+ * @method commit()
+ * @method rollBack()
+ * @method transactionLevel()
+ * @method savePoint($name)
+ * @method savePointRollBack($name)
  * @package Weekii\Lib\Database
  */
 class DB
