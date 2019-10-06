@@ -33,6 +33,12 @@ class Builder
     protected $table;
 
     /**
+     * 别名
+     * @var string
+     */
+    protected $alias = '';
+
+    /**
      * 模型实例
      * @var Model
      */
@@ -159,16 +165,40 @@ class Builder
     }
 
     /**
+     * @return string
+     */
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    /**
+     * @param string $alias
+     */
+    public function setAlias(string $alias): void
+    {
+        $this->alias = $alias;
+    }
+
+
+
+    /**
      * 获取表名
      * @return string
      */
-    public function getTableName()
+    public function getTableName($withAlias = true)
     {
         if ($this->table == null) {
             throw new \Exception('Table Can not be null.');
         }
 
-        return $this->db->tableName($this->table);
+        $tableName = $this->db->tableName($this->table);
+
+        if ($withAlias && !empty($this->alias)) {
+            $tableName .= ' AS ' . $this->alias;
+        }
+
+        return $tableName;
     }
 
     /**
@@ -810,7 +840,7 @@ class Builder
         $this->prepareBindings($values);
 
 
-        $sql = 'INSERT INTO ' . $this->getTableName() . ' (' . implode(',', $fields) . ') VALUES ' . $values;
+        $sql = 'INSERT INTO ' . $this->getTableName(false) . ' (' . implode(',', $fields) . ') VALUES ' . $values;
         return $sql;
     }
 

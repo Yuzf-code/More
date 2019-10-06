@@ -19,6 +19,12 @@ class Connection
      */
     protected $pdo;
 
+    /**
+     * 当前事务数
+     * @var int
+     */
+    protected $transactions = 0;
+
     // 配置项
     protected $options;
 
@@ -144,6 +150,131 @@ class Connection
     public function delete($query, $bindings = [])
     {
         return $this->affectingStatement($query, $bindings);
+    }
+
+    /**
+     * 获取当前事务数
+     * @return int
+     */
+    public function transactionLevel()
+    {
+        return $this->transactions;
+    }
+
+    /**
+     * @param $name
+     */
+    public function savePoint($name)
+    {
+        $this->getPDO()->exec('SAVEPOINT ' . $name);
+    }
+
+    /**
+     * @param $name
+     */
+    public function savePointRollBack($name)
+    {
+        $this->getPDO()->exec('ROLLBACK TO SAVEPOINT ' . $name);
+    }
+
+    /**
+     * 开启事务，如果已开启则保存一个节点
+     */
+    public function beginTransaction()
+    {
+        if ($this->transactions == 0) {
+            try {
+                // 开启事务
+                $this->getPdo()->beginTransaction();
+            } catch (\Exception $e) {
+                $this->handleBeginTransactionException($e);
+            }
+        } elseif ($this->transactions >= 1) {
+            // 已经有一个事务了，则在当前基础保存一个节点
+            $this->savePoint('trans' . ($this->transactions + 1));
+        }
+
+        $this->transactions++;
+    }
+
+    /**
+     * 提交事务
+     */
+    public function commit()
+    {
+        if ($this->transactions == 1) {
+            $this->getPdo()->commit();
+        }
+
+        $this->transactions = max(0, $this->transactions - 1);
+    }
+
+    /**
+     * 回滚
+     * @param null $toLevel
+     */
+    public function rollBack($toLevel = null)
+    {
+        // toLevel为null则滚到上一个节点
+        $toLevel = is_null($toLevel) ? $this->transactions - 1 : $toLevel;
+
+        // 不可用的节点，直接return
+        if ($toLevel < 0 || $toLevel >= $this->transactions) {
+            return;
+        }
+
+        // 回到事务开始时
+        if ($toLevel == 0) {
+            $this->getPDO()->rollBack();
+        } else {
+            // 回滚到指定节点
+            $this->savePointRollBack('trans' . ($toLevel + 1));
+        }
+    }
+
+    /**
+     * 在事务中执行回调
+     * @param \Closure $callback
+     * @param int $attempts
+     * @throws \Throwable
+     */
+    public function transaction(\Closure $callback, $attempts = 1)
+    {
+        for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
+            $this->beginTransaction();
+
+            try {
+                $callback();
+                $this->commit();
+            } catch (\Exception $e) {
+                $this->handleTransactionException(
+                    $e, $currentAttempt, $attempts
+                );
+            } catch (\Throwable $e) {
+                $this->rollBack();
+
+                throw $e;
+            }
+        }
+    }
+
+    protected function handleTransactionException($e, $currentAttempt, $maxAttempts)
+    {
+        if ($this->causedByDeadlock($e) &&
+            $this->transactions > 1) {
+            $this->transactions--;
+
+            throw $e;
+        }
+
+        $this->rollBack();
+
+        if ($this->causedByDeadlock($e) &&
+            $currentAttempt < $maxAttempts) {
+            return;
+        }
+
+        throw $e;
     }
 
     /**
@@ -275,12 +406,23 @@ class Connection
         throw $e;
     }
 
+    protected function handleBeginTransactionException($e)
+    {
+        if ($this->causedByLostConnection($e)) {
+            $this->reconnect();
+
+            $this->pdo->beginTransaction();
+        } else {
+            throw $e;
+        }
+    }
+
     /**
-     * 是否由断线应发的异常
-     * @param \Throwable $e
+     * 是否由断线引发的异常
+     * @param \Exception $e
      * @return bool
      */
-    protected function causedByLostConnection(\Throwable $e)
+    protected function causedByLostConnection(\Exception $e)
     {
         $message = $e->getMessage();
 
@@ -299,6 +441,28 @@ class Connection
             'child connection forced to terminate due to client_idle_limit',
             'query_wait_timeout',
             'reset by peer',
+        ]);
+    }
+
+    /**
+     * 是否由deadlock引发的异常
+     * @param \Exception $e
+     * @return bool
+     */
+    protected function causedByDeadlock(\Exception $e)
+    {
+        $message = $e->getMessage();
+
+        return Str::contains($message, [
+            'Deadlock found when trying to get lock',
+            'deadlock detected',
+            'The database file is locked',
+            'database is locked',
+            'database table is locked',
+            'A table in the database is locked',
+            'has been chosen as the deadlock victim',
+            'Lock wait timeout exceeded; try restarting transaction',
+            'WSREP detected deadlock/conflict and aborted the transaction. Try restarting the transaction',
         ]);
     }
 }

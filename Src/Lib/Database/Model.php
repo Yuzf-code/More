@@ -12,6 +12,7 @@ use More\Src\Lib\Database\Relation\HasOne;
 
 /**
  * Class Model
+ * @method Builder insert(array $data)
  * @method static Builder where()
  * @method static Builder orWhere()
  * @method static Builder whereRaw($sql, $bindings = [])
@@ -124,13 +125,13 @@ class Model implements \ArrayAccess, \JsonSerializable
         $builder->setDb($this->db);
         $builder->setModel($this);
         $builder->setResultType($this->resultType);
+        $builder->setTable($this->table);
 
         $alias = $this->alias;
         if (empty($this->alias)) {
             $alias = $this->table;
         }
-
-        $builder->setTable($this->table . ' AS ' . $alias);
+        $builder->setAlias($alias);
 
         return $builder;
     }
