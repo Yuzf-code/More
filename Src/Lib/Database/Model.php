@@ -19,6 +19,7 @@ use More\Src\Lib\Database\Relation\HasOne;
  * @method static Builder orWhereRaw($sql, $bindings = [])
  * @method static mixed get($column = ['*'])
  * @method static mixed first($column = ['*'])
+ * @method static mixed find($id, $column = ['*'])
  * @method static Builder orderBy($field, $type)
  * @method static Builder groupBy(...$fields)
  * @method static int count($field, $alias = '')
@@ -127,6 +128,24 @@ class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * 获取主键值
+     * @return mixed
+     */
+    public function getKey()
+    {
+        return $this->data[$this->primaryKey];
+    }
+
+    /**
+     * 设置主键值
+     * @param $value
+     */
+    public function setKey($value)
+    {
+        $this->data[$this->primaryKey] = $value;
+    }
+
+    /**
      * 获取查询构造器
      * @return Builder
      */
@@ -151,17 +170,6 @@ class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * 根据ID获取一条数据
-     * @param $id
-     * @param array $column
-     * @return array|Model
-     */
-    public function find($id, $column = ['*'])
-    {
-        return $this->newBuilder()->where($this->primaryKey, $id)->first($column);
-    }
-
-    /**
      * 使用当前对象插入一条数据
      * @return bool
      */
@@ -175,7 +183,7 @@ class Model implements \ArrayAccess, \JsonSerializable
         $success = $builder->insert($this->data);
 
         if ($success) {
-            $this->data[$this->primaryKey] = $builder->lastInsertId($this->primaryKey);
+            $this->setKey($builder->lastInsertId($this->primaryKey));
         }
 
         return $success;
@@ -187,27 +195,11 @@ class Model implements \ArrayAccess, \JsonSerializable
      */
     public function save()
     {
-        if (!isset($this->data[$this->primaryKey])) {
+        if (is_null($this->getKey())) {
             throw new \Exception('No primary key set. Can not use save()');
         }
 
-        return $this->newBuilder()->where($this->primaryKey, $this->data[$this->primaryKey])->update($this->data);
-    }
-
-    /**
-     * 删除数据
-     * @param null $id
-     * @return mixed
-     * @throws \Exception
-     */
-    public function delete($id = null)
-    {
-        $builder = $this->newBuilder();
-        if (!is_null($id)) {
-            $builder->where($this->primaryKey, $id);
-        }
-
-        return $builder->delete();
+        return $this->newBuilder()->where($this->primaryKey, $this->getKey())->update($this->data);
     }
 
     /**

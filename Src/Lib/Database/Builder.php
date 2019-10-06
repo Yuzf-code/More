@@ -409,6 +409,17 @@ class Builder
     }
 
     /**
+     * 根据主键查询
+     * @param $id
+     * @param array $column
+     * @return array|Model
+     */
+    public function find($id, $column = ['*'])
+    {
+        return $this->where($this->model->getPrimaryKey(), $id)->first($column);
+    }
+
+    /**
      * 插入数据
      * @param array $data
      * @return bool
@@ -464,7 +475,6 @@ class Builder
 
     /**
      * 删除数据
-     * @param null $id
      * @return int 返回受影响行数
      * @throws \Exception
      */
@@ -472,6 +482,12 @@ class Builder
     {
         if (!$this->hasConditions()) {
             throw new \Exception('Method delete() must has conditions');
+        }
+
+
+        // 有主键的话，自动添加主键条件
+        if ($this->model->getKey() !== null) {
+            $this->where($this->model->getPrimaryKey(), $this->model->getKey());
         }
 
         if ($this->softDelete) {
@@ -483,6 +499,19 @@ class Builder
         return $this->run($this->generateDeleteSQL(), $this->bindings, function ($sql, $bindings) {
             return $this->db->delete($sql, $bindings);
         });
+    }
+
+    /**
+     * 根据主键删除
+     * @param $ids
+     * @return int
+     * @throws \Exception
+     */
+    public function destroy($ids)
+    {
+        $ids = is_array($ids) ? $ids : func_get_args();
+
+        return $this->where($this->model->getPrimaryKey(), 'IN', $ids)->delete();
     }
 
     /**
