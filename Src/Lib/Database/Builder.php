@@ -319,7 +319,7 @@ class Builder
         }
 
         $operate = $this->softDeleteQueryType == self::SOFT_DELETE_QUERY_TYPE_ONLY_DELETED ? ' IS NOT NULL' : ' IS NULL';
-        $this->whereRaw($this->getTableName(true) . '.' . $this->deleteDate . $operate);
+        $this->whereRaw($this->getTableName() . '.' . $this->deleteDate . $operate);
     }
 
     /**
