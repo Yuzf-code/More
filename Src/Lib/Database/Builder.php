@@ -4,6 +4,7 @@ namespace More\Src\Lib\Database;
 
 
 use More\Src\Core\App;
+use More\Src\Lib\Database\Relation\HasMany;
 use More\Src\Lib\Database\Relation\Relation;
 
 class Builder
@@ -13,6 +14,13 @@ class Builder
      */
     const RESULT_TYPE_ARRAY = 1;
     const RESULT_TYPE_MODEL = 2;
+
+    /**
+     * 软删除模式下的查询方式
+     */
+    const SOFT_DELETE_QUERY_TYPE_DEFAULT = 1;
+    const SOFT_DELETE_QUERY_TYPE_WITH_DELETED = 2;
+    const SOFT_DELETE_QUERY_TYPE_ONLY_DELETED = 3;
 
     /**
      * db实例
@@ -37,6 +45,20 @@ class Builder
      * @var string
      */
     protected $alias = '';
+
+    /**
+     * 是否使用软删除
+     * @var bool
+     */
+    protected $softDelete = false;
+
+    protected $softDeleteQueryType = 1;
+
+    /**
+     * 软删除时间字段
+     * @var string
+     */
+    protected $deleteDate = 'delete_date';
 
     /**
      * 模型实例
@@ -202,6 +224,22 @@ class Builder
     }
 
     /**
+     * @param bool $softDelete
+     */
+    public function setSoftDelete(bool $softDelete): void
+    {
+        $this->softDelete = $softDelete;
+    }
+
+    /**
+     * @param string $deleteDate
+     */
+    public function setDeleteDate(string $deleteDate): void
+    {
+        $this->deleteDate = $deleteDate;
+    }
+
+    /**
      * AND条件表达式
      * @return $this
      */
@@ -273,6 +311,37 @@ class Builder
         return $this->getModel()->getPrimaryKey();
     }
 
+    protected function softDeleteFilter()
+    {
+        if ($this->softDeleteQueryType == self:: SOFT_DELETE_QUERY_TYPE_WITH_DELETED) {
+            // 包含被软删除的数据，则不用额外添加筛选条件
+            return;
+        }
+
+        $operate = $this->softDeleteQueryType == self::SOFT_DELETE_QUERY_TYPE_ONLY_DELETED ? ' IS NOT NULL' : ' IS NULL';
+        $this->whereRaw($this->getTableName(true) . '.' . $this->deleteDate . $operate);
+    }
+
+    /**
+     * 包含软删除数据
+     * @return $this
+     */
+    public function withDeleted()
+    {
+        $this->softDeleteQueryType = self::SOFT_DELETE_QUERY_TYPE_WITH_DELETED;
+        return $this;
+    }
+
+    /**
+     * 仅查询软删除数据
+     * @return $this
+     */
+    public function onlyDeleted()
+    {
+        $this->softDeleteQueryType = self::SOFT_DELETE_QUERY_TYPE_ONLY_DELETED;
+        return $this;
+    }
+
     /**
      * 获取多条
      * @param array $column
@@ -280,6 +349,10 @@ class Builder
      */
     public function get($column = ['*'])
     {
+        if ($this->softDelete) {
+            $this->softDeleteFilter();
+        }
+
         return $this->run($this->generateSelectSQL($column), $this->bindings, function ($sql, $bindings) {
             $result =  $this->db->select($sql, $bindings);
 
@@ -306,6 +379,10 @@ class Builder
     public function first($column = ['*'])
     {
         $this->take(1);
+
+        if ($this->softDelete) {
+            $this->softDeleteFilter();
+        }
 
         return $this->run($this->generateSelectSQL($column), $this->bindings, function ($sql, $bindings) {
             $data = $this->db->selectOne($sql, $bindings);
@@ -359,7 +436,28 @@ class Builder
      */
     public function update(array $data)
     {
+        if ($this->softDelete) {
+            $this->softDeleteFilter();
+        }
+
         return $this->run($this->generateUpdateSQL($data), $this->bindings, function ($sql, $bindings) {
+            return $this->db->update($sql, $bindings);
+        });
+    }
+
+    /**
+     * 使用原生语句更新
+     * @param string $sql
+     * @param array $bindings
+     * @return mixed
+     */
+    public function updateRaw(string $sql, array $bindings = [])
+    {
+        if ($this->softDelete) {
+            $this->softDeleteFilter();
+        }
+
+        return $this->run($this->generateUpdateRawSQL($sql, $bindings), $this->bindings, function ($sql, $bindings) {
             return $this->db->update($sql, $bindings);
         });
     }
@@ -374,6 +472,12 @@ class Builder
     {
         if (!$this->hasConditions()) {
             throw new \Exception('Method delete() must has conditions');
+        }
+
+        if ($this->softDelete) {
+            return $this->update([
+                $this->deleteDate => date('Y-m-d H:i:s')
+            ]);
         }
 
         return $this->run($this->generateDeleteSQL(), $this->bindings, function ($sql, $bindings) {
@@ -408,21 +512,19 @@ class Builder
      * @param string $alias
      * @return int
      */
-    public function count($field, $alias = '')
+    public function count($field)
     {
-        $field = 'COUNT(' . $field . ')';
-
-        if (!empty($alias)) {
-            $field .= ' AS ' . $alias;
-        } else {
-            $alias = $field;
+        if ($this->softDelete) {
+            $this->softDeleteFilter();
         }
+
+        $field = 'COUNT(' . $field . ')';
 
         $result = $this->run($this->generateSelectSQL([$field]), $this->bindings, function ($sql, $bindings) {
             return $this->db->selectOne($sql, $bindings);
         });
 
-        return $result[$alias];
+        return $result[$field];
     }
 
     /**
@@ -521,15 +623,36 @@ class Builder
         return $this;
     }
 
+    public function withCount($relationship, $fieldName = '', \Closure $helper = null)
+    {
+        $model = $this->getModel();
+
+        if (!method_exists($model, $relationship)) {
+            throw new \Exception("relationship method not found.");
+        }
+
+        $relation = $model->$relationship();
+
+        if (!$relation instanceof HasMany) {
+            throw new \Exception("relationship method must return an HasMany instance.");
+        }
+
+        if ($fieldName == '') {
+            $fieldName = $relationship;
+        }
+
+        $this->addRelationship($fieldName, $relation, null, $helper, true);
+    }
+
     /**
      * 添加关联关系
      * @param $relationship
      * @param Relation $relation
      * @param array $column
      */
-    public function addRelationship($relationship, Relation $relation, array $column = ['*'], \Closure $helper = null)
+    public function addRelationship($relationship, Relation $relation, array $column = ['*'], \Closure $helper = null, $isCount = false)
     {
-        $this->relationships[$relationship] = compact('relation', 'column', 'helper');
+        $this->relationships[$relationship] = compact('relation', 'column', 'helper', 'isCount');
     }
 
     /**
@@ -539,7 +662,12 @@ class Builder
     protected function loadRelationship(&$row)
     {
         foreach ($this->relationships as $key => $item) {
-            $row[$key] = $item['relation']->getResult($row, $item['column'], $item['helper']);
+            if ($item['isCount']) {
+                // withCount
+                $row[$key] = $item['relation']->getCount($row, $item['helper']);
+            } else {
+                $row[$key] = $item['relation']->getResult($row, $item['column'], $item['helper']);
+            }
         }
     }
 
@@ -630,6 +758,17 @@ class Builder
         }
 
         $sql .= implode(', ', $setFields) . $this->generateConditionsSQL();
+        return $sql;
+    }
+
+    protected function generateUpdateRawSQL($sql, $bindings)
+    {
+        foreach ($bindings as $value) {
+            $this->prepareBindings($value);
+        }
+
+        $sql = 'UPDATE ' . $this->getTableName() . ' SET ' . $sql . $this->generateConditionsSQL();
+
         return $sql;
     }
 

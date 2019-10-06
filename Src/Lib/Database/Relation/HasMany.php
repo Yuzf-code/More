@@ -19,4 +19,11 @@ class HasMany extends Relation
         $this->addConditions($helper);
         return $this->related->get($column);
     }
+
+    public function getCount($parent, \Closure $helper = null)
+    {
+        $this->setParent($parent);
+        $this->addConditions($helper);
+        return $this->related->count('*');
+    }
 }

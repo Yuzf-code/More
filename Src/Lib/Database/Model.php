@@ -75,6 +75,18 @@ class Model implements \ArrayAccess, \JsonSerializable
     protected $resultType = self::RESULT_TYPE_ARRAY;
 
     /**
+     * 是否启用软删除
+     * @var bool
+     */
+    protected $softDelete = false;
+
+    /**
+     * 软删除时间字段
+     * @var string
+     */
+    protected $deleteDate = 'delete_date';
+
+    /**
      * 查询构造器
      * @var Builder
      */
@@ -126,6 +138,8 @@ class Model implements \ArrayAccess, \JsonSerializable
         $builder->setModel($this);
         $builder->setResultType($this->resultType);
         $builder->setTable($this->table);
+        $builder->setSoftDelete($this->softDelete);
+        $builder->setDeleteDate($this->deleteDate);
 
         $alias = $this->alias;
         if (empty($this->alias)) {
