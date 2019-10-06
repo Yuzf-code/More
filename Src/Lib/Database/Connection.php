@@ -182,7 +182,7 @@ class Connection
      */
     public function beginTransaction()
     {
-        if ($this->transactions == 0) {
+        if (!$this->getPDO()->inTransaction()) {
             try {
                 // 开启事务
                 $this->getPdo()->beginTransaction();
@@ -230,6 +230,8 @@ class Connection
             // 回滚到指定节点
             $this->savePointRollBack('trans' . ($toLevel + 1));
         }
+
+        $this->transactions = $toLevel;
     }
 
     /**
@@ -246,6 +248,7 @@ class Connection
             try {
                 $callback();
                 $this->commit();
+                return;
             } catch (\Exception $e) {
                 $this->handleTransactionException(
                     $e, $currentAttempt, $attempts
@@ -260,8 +263,8 @@ class Connection
 
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts)
     {
-        $this->transactions--;
         if ($this->causedByDeadlock($e) && $this->transactions > 1) {
+            $this->transactions--;
             throw $e;
         }
 
