@@ -260,17 +260,14 @@ class Connection
 
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts)
     {
-        if ($this->causedByDeadlock($e) &&
-            $this->transactions > 1) {
-            $this->transactions--;
-
+        $this->transactions--;
+        if ($this->causedByDeadlock($e) && $this->transactions > 1) {
             throw $e;
         }
 
         $this->rollBack();
 
-        if ($this->causedByDeadlock($e) &&
-            $currentAttempt < $maxAttempts) {
+        if ($this->causedByDeadlock($e) && $currentAttempt < $maxAttempts) {
             return;
         }
 
