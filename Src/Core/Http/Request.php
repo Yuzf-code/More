@@ -60,6 +60,15 @@ class Request
         }
     }
 
+    public function getHeader($key = null)
+    {
+        if (is_null($key)) {
+            return $this->swooleRequest->header;
+        } else {
+            return $this->swooleRequest->header[$key];
+        }
+    }
+
     public function getSwooleRequest()
     {
         return $this->swooleRequest;
