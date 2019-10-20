@@ -44,7 +44,7 @@ class Response
 
     public function sendFile($filename, $offset = 0, $length = 0)
     {
-        $this->sendFile($filename, $offset, $length);
+        $this->swooleResponse->sendFile($filename, $offset, $length);
     }
 
     public function detach()
