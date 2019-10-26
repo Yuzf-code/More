@@ -69,6 +69,11 @@ class Request
         }
     }
 
+    public function getFiles()
+    {
+        return $this->swooleRequest->files;
+    }
+
     public function getSwooleRequest()
     {
         return $this->swooleRequest;
