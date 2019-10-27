@@ -69,9 +69,13 @@ class Request
         }
     }
 
-    public function getFiles()
+    public function getFile($key = null)
     {
-        return $this->swooleRequest->files;
+        if (is_null($key)) {
+            return $this->swooleRequest->files;
+        } else {
+            return $this->swooleRequest->files[$key];
+        }
     }
 
     public function getSwooleRequest()
