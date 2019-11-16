@@ -851,9 +851,6 @@ class Builder
                 $carry .= ', ';
             }
 
-            $this->prepareBindings($item['field']);
-            $this->prepareBindings($item['type']);
-
             return $carry . $item['field'] . ' ' . $item['type'];
 
         }, $initial);
