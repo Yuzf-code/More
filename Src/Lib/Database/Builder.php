@@ -673,6 +673,8 @@ class Builder
         }
 
         $this->addRelationship($fieldName, $relation, null, $helper, true);
+
+        return $this;
     }
 
     /**
