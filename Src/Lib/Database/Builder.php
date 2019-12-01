@@ -672,7 +672,7 @@ class Builder
             $fieldName = $relationship;
         }
 
-        $this->addRelationship($fieldName, $relation, null, $helper, true);
+        $this->addRelationship($fieldName, $relation, ['*'], $helper, true);
 
         return $this;
     }
