@@ -828,10 +828,6 @@ class Builder
     {
         $sql = '';
         if (!empty($this->groupBy)) {
-            array_walk($this->groupBy, function (&$field, $index) {
-                $this->prepareBindings($field);
-            });
-
             $sql = ' GROUP BY ' . implode(', ', $this->groupBy);
         }
         return $sql;
