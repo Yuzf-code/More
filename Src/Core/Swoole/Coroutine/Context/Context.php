@@ -20,8 +20,6 @@ trait Context
 {
     protected static $context = [];
 
-    protected static $prefix = '';
-
     protected static function handlePrefix(&$key) {
         if (!empty(static::$prefix)) {
             $key .= static::$prefix . '#';
