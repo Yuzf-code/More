@@ -15,7 +15,9 @@ use More\Src\Core\Swoole\Coroutine\Context\Context;
  * Class DBContext
  * @package Weekii\Core\Swoole\Coroutine\Context
  */
-class DBContext extends Context
+class DBContext
 {
+    use Context;
+
     protected static $prefix = 'db';
 }

@@ -15,7 +15,9 @@ use More\Src\Core\Swoole\Coroutine\Context\Context;
  * Class RedisContext
  * @package Weekii\Core\Swoole\Coroutine\Context
  */
-class RedisContext extends Context
+class RedisContext
 {
+    use Context;
+
     protected static $prefix = 'redis';
 }

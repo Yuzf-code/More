@@ -13,10 +13,10 @@ use More\Src\Core\Swoole\Coroutine\CoroutineExcepiton;
 
 /**
  * Global Coroutine Context Manager
- * Class Context
- * @package Weekii\Core\Swoole\Coroutine\Context
+ * Trait Context
+ * @package More\Src\Core\Swoole\Coroutine\Context
  */
-class Context
+trait Context
 {
     protected static $context = [];
 
