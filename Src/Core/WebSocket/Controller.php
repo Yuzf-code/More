@@ -10,6 +10,8 @@ abstract class Controller
 {
     protected $app;
     protected $request;
+    protected $middlewares = [];
+
     /**
      * @var \swoole_websocket_server
      */
@@ -44,5 +46,10 @@ abstract class Controller
     protected function actionNotFound($actionName)
     {
         $this->write("Action: " . $actionName . "Not Found.");
+    }
+
+    public function getMiddlewares()
+    {
+        return $this->middlewares;
     }
 }

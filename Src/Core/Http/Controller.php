@@ -15,6 +15,7 @@ abstract class Controller
     protected $app;
     protected $request;
     protected $response;
+    protected $middlewares = [];
     protected $view;
 
     protected $tplVar = [];
@@ -78,5 +79,10 @@ abstract class Controller
         $params = array_merge($params, $this->tplVar);
         $content = $this->view->render($view, $params);
         $this->response->write($content);
+    }
+
+    public function getMiddlewares()
+    {
+        return $this->middlewares;
     }
 }

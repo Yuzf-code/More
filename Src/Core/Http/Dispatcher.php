@@ -4,6 +4,7 @@ namespace More\Src\Core\Http;
 use duncan3dc\Laravel\BladeInstance;
 use More\Src\Core\App;
 use More\Src\Core\Route\RouteRule;
+use More\Src\Lib\Pipeline\Pipeline;
 
 class Dispatcher
 {
@@ -48,7 +49,7 @@ class Dispatcher
                 if (is_callable($routeInfo['target'])) {
                     // 未绑定控制器，直接调用
                     call_user_func_array($routeInfo['target'], [$request, $response, $view]);
-                    return;
+                    return $response;
                 } elseif (is_string($routeInfo['target'])) {
                     $list = explode('@', $routeInfo['target']);
                     $request->setControllerNamespace($list[0]);
@@ -57,7 +58,7 @@ class Dispatcher
                 break;
         }
 
-        $this->runAction($request, $response, $view);
+        return $this->runAction($request, $response, $view);
     }
 
     /**
@@ -71,18 +72,25 @@ class Dispatcher
     {
         $controllerNamespace = $request->getControllerNamespace();
         if (class_exists($controllerNamespace)) {
+            /**  @var Controller  */
             $obj = new $controllerNamespace($request, $response, $view);
-            $actionName = $request->getActionName();
-            if (method_exists($obj, $actionName)) {
-                //$obj->$actionName();
-                $this->app->call([$obj, $actionName]);
-            } else {
-                $obj->actionNotFound();
-            }
+
+            (new Pipeline($this->app))->send($request)
+                ->trough($obj->getMiddlewares())
+                ->then(function ($request) use ($obj) {
+                    $actionName = $request->getActionName();
+                    if (method_exists($obj, $actionName)) {
+                        $this->app->call([$obj, $actionName]);
+                    } else {
+                        $obj->actionNotFound();
+                    }
+                });
         } else {
             // 返回404
             $response->withStatus(404);
             $response->write('<h1>page not found</h1>');
         }
+
+        return $response;
     }
 }

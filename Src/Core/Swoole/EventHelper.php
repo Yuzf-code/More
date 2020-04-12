@@ -14,6 +14,7 @@ use More\Src\Core\WebSocket\CommandContext;
 use More\Src\Core\WebSocket\DispatchException;
 use More\Src\GlobalEvent;
 use More\Src\Lib\Config;
+use More\Src\Lib\Pipeline\Pipeline;
 
 class EventHelper
 {
@@ -29,7 +30,16 @@ class EventHelper
         // 注册request回调
         $app = App::getInstance();
         $dispatcher = new Dispatcher(App::getInstance(), $controllerNameSpace);
-        $register->set($register::onRequest, function (\swoole_http_request $swooleRequest, \swoole_http_response $swooleResponse) use ($dispatcher, $app) {
+
+        // 获取全局中间件组
+        if ($app->offsetExists(Constant::GLOBAL_MIDDLEWARES)) {
+            $middlewares = $app->get(Constant::GLOBAL_MIDDLEWARES);
+        } else {
+            $middlewares = [];
+        }
+
+
+        $register->set($register::onRequest, function (\swoole_http_request $swooleRequest, \swoole_http_response $swooleResponse) use ($dispatcher, $app, $middlewares) {
             $request = new Request($swooleRequest);
             $response = new Response($swooleResponse);
             $view = new BladeInstance(PROJECT_ROOT . '/App/View', Config::getInstance()->get('app')['tempDir'] . '/templates');
@@ -38,7 +48,14 @@ class EventHelper
 
             try {
                 GlobalEvent::onRequest($request, $response);
-                $dispatcher->dispatch($request, $response, $view);
+
+                // 请求通过全局中间件
+                (new Pipeline($app))->send($request)
+                    ->trough($middlewares)
+                    ->then(function ($request) use ($dispatcher, $response, $view) {
+                        $dispatcher->dispatch($request, $response, $view);
+                    });
+
                 GlobalEvent::afterAction($request, $response);
             } catch (\Throwable $e) {
                 if (isset($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER]) && is_callable($app[Constant::HTTP_REQUEST_EXCEPTION_HANDLER])) {
