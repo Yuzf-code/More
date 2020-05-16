@@ -21,15 +21,10 @@ class RouteRule
     private static $needInit = true;
     private static $rule = [];
 
-    private static $routeCache = false;
-    private static $routeCacheTable = null;
-
     // 导入路由规则
     public static function init()
     {
         if (self::$needInit) {
-
-            self::cacheHandle();
 
             $directory =PROJECT_ROOT . '/App/Routes/';
             $file = scandir($directory);
@@ -44,26 +39,8 @@ class RouteRule
         }
     }
 
-    private static function cacheHandle()
-    {
-        // 路由缓存相关
-        if (Config::getInstance()->get('app')['routeCache']) {
-            self::$routeCache = true;
-            self::$routeCacheTable = App::getInstance()->get(Config::getInstance()->get('app')['routeTableName']);
-        }
-    }
-
     public static function runRule($method, $path)
     {
-        // 路由缓存相关
-        if (self::$routeCache) {
-            if (self::$routeCacheTable->exist($method . '@' . $path)) {
-                $result = self::$routeCacheTable->get($method . '@' . $path);
-                $result['args'] = json_decode($result['args'], true);
-                return $result;
-            }
-        }
-
         // 先尝试匹配当前方法的规则
         $result = self::runRuleGroup($method, $path);
 
@@ -74,15 +51,6 @@ class RouteRule
 
         // 规则匹配成功
         if (!empty($result)) {
-            // 只有解析成功过的才缓存且暂时只缓存目标为控制器的路由，闭包的话感觉还是不太必要
-            if (self::$routeCache && is_string($result['target'])) {
-                self::$routeCacheTable->set($method . '@' . $path, [
-                    'status' => $result['status'],
-                    'target' => $result['target'],
-                    'args' => json_encode($result['args'])
-                ]);
-            }
-
             return $result;
         }
 
