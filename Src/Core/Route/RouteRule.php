@@ -18,8 +18,9 @@ class RouteRule
     const NOT_FOUND = 2;
 
     // 是否需要初始化
-    private static $needInit = true;
+    protected static $needInit = true;
     private static $rule = [];
+    protected static $trees = [];
 
     // 导入路由规则
     public static function init()
@@ -64,7 +65,23 @@ class RouteRule
 
     public static function runRuleGroup($method, $path)
     {
-        $pathSlice = explode('/', $path);
+        if (empty(self::$trees[$method])) {
+            return false;
+        }
+
+        $root = self::$trees[$method];
+
+        $result = $root->search($path);
+
+        if ($result !== false) {
+            return [
+                'status' => self::FOUND,
+                'target' => $result['handler'],
+                'args' => $result['params']
+            ];
+        }
+
+        /*$pathSlice = explode('/', $path);
 
         foreach (self::$rule[$method] as $rule) {
             $patternSlice = explode('/', $rule['pattern']);
@@ -89,57 +106,100 @@ class RouteRule
                 }
             }
 
+
+
             // 当前规则解析完成
             return [
                 'status' => self::FOUND,
                 'target' => $rule['target'],
                 'args' => $args
             ];
-        }
+        }*/
         // 没有匹配规则
         return false;
     }
 
+    /**
+     * 添加路由规则
+     * @param $pattern
+     * @param $target
+     * @param string $method
+     * @throws \Exception
+     */
     public static function rule($pattern, $target, $method = '*')
     {
-        $methodGroup = $method;
-        $pattern = trim($pattern, '/');
-
-        if (strpos($method, '|')) {
-            $methodGroup = '*';
+        if (isset(self::$trees[$method])) {
+            $root = self::$trees[$method];
+        } else {
+            $root = new Node();
+            $root->type = Node::TYPE_ROOT;
+            self::$trees[$method] = $root;
         }
-        self::$rule[$methodGroup][] = [
-            'pattern' => $pattern,
-            'target' => $target,
-            'method' => $method
-        ];
+
+        $root->addRoute($pattern, $target);
     }
 
+    /**
+     * 添加 GET 方法路由
+     * @param $pattern
+     * @param $target
+     * @throws \Exception
+     */
     public static function get($pattern, $target)
     {
         self::rule($pattern, $target, 'GET');
     }
 
+    /**
+     * 添加 POST 方法路由
+     * @param $pattern
+     * @param $target
+     * @throws \Exception
+     */
     public static function post($pattern, $target)
     {
         self::rule($pattern, $target, 'POST');
     }
 
+    /**
+     * 添加 PUT 方法路由
+     * @param $pattern
+     * @param $target
+     * @throws \Exception
+     */
     public static function put($pattern, $target)
     {
         self::rule($pattern, $target, 'PUT');
     }
 
+    /**
+     * 添加 DELETE 方法路由
+     * @param $pattern
+     * @param $target
+     * @throws \Exception
+     */
     public static function delete($pattern, $target)
     {
         self::rule($pattern, $target, 'DELETE');
     }
 
+    /**
+     * 添加 PATCH 方法路由
+     * @param $pattern
+     * @param $target
+     * @throws \Exception
+     */
     public static function patch($pattern, $target)
     {
         self::rule($pattern, $target, 'PATCH');
     }
 
+    /**
+     * 添加普通路由
+     * @param $pattern
+     * @param $target
+     * @throws \Exception
+     */
     public static function any($pattern, $target)
     {
         self::rule($pattern, $target, '*');
@@ -149,6 +209,7 @@ class RouteRule
      * 消息路由（websocket tcp 等长连接协议使用）
      * @param $pattern
      * @param $target
+     * @throws \Exception
      */
     public static function message($pattern, $target)
     {
