@@ -81,40 +81,6 @@ class RouteRule
             ];
         }
 
-        /*$pathSlice = explode('/', $path);
-
-        foreach (self::$rule[$method] as $rule) {
-            $patternSlice = explode('/', $rule['pattern']);
-
-            $args = [];
-            foreach ($patternSlice as $index => $item) {
-                // 路由变量
-                if (strpos($item, ':') !== false) {
-                    if (isset($pathSlice[$index])) {
-                        // 路由变量匹配成功，直接跳过，继续向下解析
-                        $args[str_replace(':', '', $item)] = $pathSlice[$index];
-                        continue;
-                    } else {
-                        // 路由变量解析失败，跳过此规则
-                        continue 2;
-                    }
-                }
-
-                // 不匹配则跳过此规则
-                if (!isset($pathSlice[$index]) || $item !== $pathSlice[$index]) {
-                    continue 2;
-                }
-            }
-
-
-
-            // 当前规则解析完成
-            return [
-                'status' => self::FOUND,
-                'target' => $rule['target'],
-                'args' => $args
-            ];
-        }*/
         // 没有匹配规则
         return false;
     }

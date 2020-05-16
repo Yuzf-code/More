@@ -45,6 +45,7 @@ class Node
                 $child->path = substr($n->path, $i);
 
                 $n->path = substr($n->path, 0, $i);
+                $n->paramsChild = false;
                 $n->child = [$child];
                 $n->indices = $child->path[0];
             }
@@ -244,7 +245,7 @@ class Node
 
                     $params[str_replace(':', '', $n->path)] = substr($path, 0, $end);
 
-                    if ($end < $path) {
+                    if ($end < strlen($path)) {
                         $path = substr($path, $end);
 
                         $n = $n->findNextChild($path);

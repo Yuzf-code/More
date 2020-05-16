@@ -11,6 +11,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         // TODO: Implement boot() method.
+        RouteRule::init();
     }
 
     public function register()

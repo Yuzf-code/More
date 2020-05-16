@@ -10,12 +10,11 @@ class Router
     public function __construct($method, $path)
     {
         $this->method = $method;
-        $this->requestPath = ltrim($path, '/');
+        $this->requestPath = $path;
     }
 
     public function dispatch()
     {
-        RouteRule::init();
         return RouteRule::runRule($this->method, $this->requestPath);
     }
 }
